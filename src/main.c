@@ -1,107 +1,29 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
+#include "database.h"
 
-#define NAME_SIZE 10
+#define MAX_FILENAME 20
 
-void displayIntroMessage();
+int main(void) {
 
-int main() { 
-    puts("Welcome to the dragon lair!");
-    displayIntroMessage();
+    char filename[MAX_FILENAME];
 
-    int inputValue = 0;
-   
-    displayMainMenu(); // Displays the different options you have.
+    Database *database = createDatabase(); // empty database on the heap returns a database pointer to it.
+    // Note that the function createDatabase should allocate memory on the heap for both the
+    // Database struct and the dynamic array contained in its member dragons! Also initialise its
+    // members capacity to the INITIAL_CAPACITY, size to 0, and nextId to 1.
 
-    while (inputValue != -1) {
-        printf("?: ");
-        scanf("%d", &inputValue);
+    getDatabaseFilename(filename); // prompts the user for a database filname e.g dragons.txt 
+    loadDatabase(filename, database); // uses file and pointer to load record
 
-        switch (inputValue) {
-            
-            case 0: 
-                displayMainMenu();
-                break;
+    printWelcomeMessage(); //contains welcomeMessage (display mainmenu)
+    executeCommands(database); // switch (mainmenu)
 
-            case 1:
-                // char input[NAME_SIZE];
-
-                // for (size_t i = 0; i < NAME_SIZE; i++) {
-                // printf("Please enter the name of your dragon: ");
-                // scanf("%s", &input);
-                //     while (something) {
-                    
-                //         if (!isalpha(input[i])) {
-                //             printf("Invalid input! Allowed characters are: (A-Z, a-z).");
-                //             break;
-                //         }
-                    
-                //     }
-                // }
-                
-
-                break;
-
-            case 2: 
-            
-                break;
-                
-            case 3:
-                
-                break;
-            
-            case 4:
-                
-                break;
-
-            case 5:
-                break;
-
-            case 6:
-                break;
-
-            case 7: 
-                
-                break;
-            
-            case 8:
-                
-                break;
-
-            case -1:
-                printf("Have a good one! See ya!");
-                break;
-
-            default:
-                puts("Invalid selection. Please try again.!\n");
-                break;   
-        }
-    }
+    saveDatabase(filename, database); // database overwritten
+    destroyDatabase(database); // free database from heap
     return 0;
-} // End of the main function.
-
-void displayIntroMessage() {
-    puts(
-        "=========================================================================="
-        "\n  This program helps organize information about dragons. You may add and"
-        "\n  remove dragons and their attributes, list the dragons currently in the"
-        "\n  database, and their attributes, look up the attributes of an individual"
-        "\n  dragon, get statistics from the database, or sort the database."
-        "\n=========================================================================="
-    );
 }
 
-void displayMainMenu() { // Displays the main menu and promtps the user to select an option.
-   puts("\n== Main Menu ==\n"
-   "0. Display menu.\n"
-   "1. Insert a dragon.\n"
-   "2. Update a dragon.\n"
-   "3. Delete a dragon.\n"
-   "4. List all dragons (brief).\n"
-   "5. List all dragons (detailed).\n"      
-   "6. Show details for a specific dragons.\n"      
-   "7. List database statistics.\n"
-   "8. Sort database.\n"      
-   "-1. Quit.\n");      
-} // End of displayMainMenu
+
+
