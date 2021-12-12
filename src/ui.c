@@ -1,8 +1,6 @@
 #include "database.h"
 #include "dragon.h"
 
-// #define NAME_SIZE 10
-
 void executeCommands(database) { 
     puts("Welcome to the dragon lair!");
 
@@ -16,28 +14,8 @@ void executeCommands(database) {
 
         switch (inputValue) {
             
-            case 0: 
-                displayMainMenu();
-                break;
-
-            case 1:
-                // char input[NAME_SIZE];
-
-                // for (size_t i = 0; i < NAME_SIZE; i++) {
-                // printf("Please enter the name of your dragon: ");
-                // scanf("%s", &input);
-                //     while (something) {
-                    
-                //         if (!isalpha(input[i])) {
-                //             printf("Invalid input! Allowed characters are: (A-Z, a-z).");
-                //             break;
-                //         }
-                    
-                //     }
-                // }
-                
-
-                break;
+            case 0: displayMainMenu(); break;
+            case 1: insertDragon(database); break;
 
             case 2: 
             
@@ -88,16 +66,18 @@ void printWelcomeMessage() {
 }
 
 void displayMainMenu() { // Displays the main menu and promtps the user to select an option.
-   puts("\n== Main Menu ==\n"
-   "0. Display menu.\n"
-   "1. Insert a dragon.\n"
-   "2. Update a dragon.\n"
-   "3. Delete a dragon.\n"
-   "4. List all dragons (brief).\n"
-   "5. List all dragons (detailed).\n"      
-   "6. Show details for a specific dragons.\n"      
-   "7. List database statistics.\n"
-   "8. Sort database.\n"      
-   "-1. Quit.\n");      
+    puts(
+        "\n== Main Menu ==\n"
+        "0. Display menu.\n"
+        "1. Insert a dragon.\n"
+        "2. Update a dragon.\n"
+        "3. Delete a dragon.\n"
+        "4. List all dragons (brief).\n"
+        "5. List all dragons (detailed).\n"      
+        "6. Show details for a specific dragons.\n"      
+        "7. List database statistics.\n"
+        "8. Sort database.\n"      
+        "-1. Quit.\n"
+    );
 } // End of displayMainMenu
 

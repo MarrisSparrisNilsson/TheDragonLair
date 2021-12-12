@@ -2,6 +2,7 @@
 #include <ctype.h>
 #include <string.h>
 #include "database.h"
+#include "ui.h"
 
 #define MAX_FILENAME 20
 
@@ -17,7 +18,7 @@ int main(void) {
     getDatabaseFilename(filename); // prompts the user for a database filname e.g dragons.txt 
     loadDatabase(filename, database); // uses file and pointer to load record
 
-    printWelcomeMessage(); //contains welcomeMessage (display mainmenu)
+    printWelcomeMessage(); // contains welcomeMessage (display mainmenu)
     executeCommands(database); // switch (mainmenu)
 
     saveDatabase(filename, database); // database overwritten

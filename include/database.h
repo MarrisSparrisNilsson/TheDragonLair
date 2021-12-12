@@ -13,4 +13,7 @@ typedef struct Database {
     unsigned int nextId;
 } Database;
 
+void listDBStatistics(Database* database);
+void sortDB(Database* database);
+
 #endif

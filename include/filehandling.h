@@ -3,11 +3,10 @@
 
 #include "database.h"
 
-
-void destroyDatabase(Database* dB);
+void destroyDatabase(Database*);
 Database* createDatabase();
 void getDatabaseFilename(char *filename);
-void loadDatabase(char *filename, Database* dB);
-void saveDatabase(char *filename, Database* dB);
+void loadDatabase(char *filename, Database*);
+void saveDatabase(char *filename, Database*);
 
 #endif

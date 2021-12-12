@@ -12,4 +12,16 @@ typedef struct Dragon {
     char *colours[MAX_COLOURS];
 } Dragon;
 
+void insertDragon(Database* database);
+char setDragonName();
+char setIsVolant();
+int setFierceness();
+char setDragonColor();
+
+void updateDragon(Database* database, Dragon dragon);
+void deleteDragon(Database* database, Dragon dragon);
+void listBriefDragons(Database* database, Dragon dragon);
+void listDetailedDragons(Database* database, Dragon dragon);
+void showDragonDetail(Database* database, Dragon dragon);
+
 #endif
