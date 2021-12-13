@@ -3,7 +3,7 @@
 
 #include "database.h"
 
-void executeCommands(Database*);
+void executeCommands();
 void printWelcomeMessage();
 void displayMainMenu();
 

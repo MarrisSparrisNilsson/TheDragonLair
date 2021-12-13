@@ -3,15 +3,17 @@
 #include <ctype.h>
 #include "database.h"
 
-#define NAME_SIZE 10
+void insertDragon() {
 
-void insertDragon(Database* database) {
-
-    char dragonName = setDragonName();
+    // char *dragonName[NAME_SIZE];
+    // char *dragonName;
+    char dragonName[NAME_SIZE];
+    setDragonName(dragonName);
     char isVolant = setIsVolant();
     int fierceness = setFierceness();
-    char dragonColor = setDragonColor();
-
+    char dragonColor[MAX_COLOURS];
+    // char *dragonColor[MAX_COLOURS];
+    // setDragonColor(dragonColor);
     // Insert into database
 
     // When all the dragon’s attributes have been supplied by the user, the dragon should be inserted
@@ -25,16 +27,16 @@ void insertDragon(Database* database) {
 // enter the dragon’s name (i.e. a string only containing letters from the English alphabet).
 // If the user doesn’t enter a valid name (i.e. anything but letters from the English alphabet), the
 // program should output an error message and ask the user to try again.
-char setDragonName() {
-    char dragonName[NAME_SIZE];
+// void setDragonName(char *dragonName) {
+void setDragonName(char dragonName[NAME_SIZE]) {
     bool isValidName = false;
     printf("Please enter the name of your dragon: ");
 
     while (isValidName == false) {
-        scanf("%s", &dragonName);
+        scanf("%s", &*dragonName);
         
-        for (size_t i = 0; i < NAME_SIZE; i++) {
-            if (!isalpha(dragonName[i])) { // If the character on position i is NOT an alpha character, the name is invalid.
+        for (size_t i = 0; dragonName[i] != '\0'; i++) {
+            if (!isalpha((dragonName[i]))) { // If the character on position i is NOT an alpha character, the name is invalid.
                 puts("\nInvalid name! Allowed characters are: (A-Z, a-z).\n");
                 printf("Please enter the name of your dragon: ");
                 break;
@@ -42,7 +44,7 @@ char setDragonName() {
             isValidName = true;
         }
     }
-    return dragonName;
+    // return *(&dragonName);
 }
 
 
@@ -51,18 +53,19 @@ char setDragonName() {
 // or 'n') are valid. An invalid choice is again handled with an error message and asking the user to
 // try again.
 char setIsVolant() {
-    char isVolant[1];
+    char isVolant;
 
     do {
         printf("Is your dragon volant? (Y/N): ");
+        fflush(stdin);
         scanf("%c", &isVolant);
 
-        toupper(isVolant);
+        isVolant = toupper(isVolant);
 
-        if (isVolant != 'Y' || isVolant != 'N') 
+        if (isVolant != 'Y' && isVolant != 'N') 
             puts("Invalid input! Please try again.\n");
 
-    } while (isVolant != 'Y' || isVolant != 'N');
+    } while (isVolant != 'Y' && isVolant != 'N');
     
     return isVolant;
 }
@@ -80,7 +83,7 @@ int setFierceness() {
         if (fierceness > 10)
             puts("Invalid input! Please enter numbers of the given range.\n");
 
-    } while (fierceness != 'Y' || fierceness != 'N');
+    } while (fierceness < 0 && fierceness > 10);
     
     return fierceness;
 }
@@ -89,9 +92,43 @@ int setFierceness() {
 // a colour is an arbitrary string representing a colour). The user should not select the number
 // of colours to enter, prior to entering the colours. Instead, the program should stop asking for
 // additional colours when the user enters an empty string, or when 5 colours have been entered.
-char setDragonColor() {
+// void setDragonColor(char* dragonColor) {
+// void setDragonColor(char dragonColor[MAX_COLOURS]) {
+//     // char *colorArray;
+//     char color[NAME_SIZE];
+//     char *colorPtr;
 
-}
+//     for (size_t i = 0; i < MAX_COLOURS || *(color + i) != '\0' ; i++) {
+//         printf("Please enter color #%d for your dragon", i+1);
+//         scanf("%s", &color);
+
+//         int colorLength = strlen(*color);
+
+//         for (size_t j = 0; color[j] == '\0'; j++) {
+//             if (!isalpha(color[i])) {
+//                 puts("Invalid input, color must only be asigned with characters of A-Z");
+//             }
+//             *color = toupper(*(color + i));
+//         }
+        
+//         colorPtr = dragonColor;
+//         *colorPtr = *color;
+//         colorPtr+colorLength;
+//     }
+// }
+
+// void setDragonColor(char dragonColor[MAX_COLOURS]) {
+//  toupper
+//     int count = 0;
+//     char colorInput[NAME_SIZE];
+    
+//     for (; count > MAX_COLOURS || *colorInput + count != '\0'; ) {
+//         printf("Please enter between 1-5 colours to the dragon");
+//         scanf("%s", &colorInput);
+//         dragonColor = colorInput;
+//         count++;
+//     }
+// }
 
 void updateDragon(Database* database, Dragon dragon) {
 

@@ -2,6 +2,7 @@
 #define _dragon_h
 
 #define MAX_COLOURS 5
+#define NAME_SIZE 10
 
 typedef struct Dragon {
     unsigned int id;
@@ -12,16 +13,18 @@ typedef struct Dragon {
     char *colours[MAX_COLOURS];
 } Dragon;
 
-void insertDragon(Database* database);
-char setDragonName();
+void insertDragon();
+void setDragonName(char dragonName[NAME_SIZE]);
+// void setDragonName(char *dragonName[NAME_SIZE]);
 char setIsVolant();
 int setFierceness();
-char setDragonColor();
+void setDragonColor(char dragonColor[MAX_COLOURS]);
+// void setDragonColor(char *dragonColor[MAX_COLOURS]);
 
-void updateDragon(Database* database, Dragon dragon);
-void deleteDragon(Database* database, Dragon dragon);
-void listBriefDragons(Database* database, Dragon dragon);
-void listDetailedDragons(Database* database, Dragon dragon);
-void showDragonDetail(Database* database, Dragon dragon);
+// void updateDragon(Database* database, Dragon dragon);
+// void deleteDragon(Database* database, Dragon dragon);
+// void listBriefDragons(Database* database, Dragon dragon);
+// void listDetailedDragons(Database* database, Dragon dragon);
+// void showDragonDetail(Database* database, Dragon dragon);
 
 #endif
