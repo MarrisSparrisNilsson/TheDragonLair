@@ -1,7 +1,10 @@
-#include "database.h"
+#include <stdio.h>
+// #include "database.h"
 #include "dragon.h"
+#include "ui.h"
 
-void executeCommands(database) { 
+
+void executeCommands() { 
     puts("Welcome to the dragon lair!");
 
     int inputValue = 0;
@@ -15,7 +18,7 @@ void executeCommands(database) {
         switch (inputValue) {
             
             case 0: displayMainMenu(); break;
-            case 1: insertDragon(database); break;
+            case 1: insertDragon(); break;
 
             case 2: 
             
