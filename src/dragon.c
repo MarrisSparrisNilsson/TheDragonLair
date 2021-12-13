@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <ctype.h>
+#include <string.h>
 #include "database.h"
 
 void insertDragon() {
@@ -42,9 +43,9 @@ void setDragonName(char dragonName[NAME_SIZE]) {
                 break;
             }        
             isValidName = true;
+            dragonName[i] = toupper(dragonName[i]);
         }
     }
-    // return *(&dragonName);
 }
 
 
@@ -83,7 +84,7 @@ int setFierceness() {
         if (fierceness > 10)
             puts("Invalid input! Please enter numbers of the given range.\n");
 
-    } while (fierceness < 0 && fierceness > 10);
+    } while (fierceness < 0 || fierceness > 10);
     
     return fierceness;
 }
