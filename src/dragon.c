@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdbool.h>
+#include <ctype.h>
 #include "database.h"
 
 #define NAME_SIZE 10
@@ -12,6 +13,12 @@ void insertDragon(Database* database) {
     char dragonColor = setDragonColor();
 
     // Insert into database
+
+    // When all the dragon’s attributes have been supplied by the user, the dragon should be inserted
+    // (entered) into the database, and the user notified about this. The database should assign a
+    // unique id to the dragon, when inserting it into the database (the id should not be entered by
+    // the user). A dragon’s id will never change, as long as the dragon is in the database (even when
+    // loading the database from a text file).
 }
 
 // When the user chooses to insert (add) a new dragon to the database, the user should be asked to
@@ -44,14 +51,38 @@ char setDragonName() {
 // or 'n') are valid. An invalid choice is again handled with an error message and asking the user to
 // try again.
 char setIsVolant() {
+    char isVolant[1];
 
+    do {
+        printf("Is your dragon volant? (Y/N): ");
+        scanf("%c", &isVolant);
+
+        toupper(isVolant);
+
+        if (isVolant != 'Y' || isVolant != 'N') 
+            puts("Invalid input! Please try again.\n");
+
+    } while (isVolant != 'Y' || isVolant != 'N');
+    
+    return isVolant;
 }
 
 // Next, the program should ask the user to enter the dragon’s fierceness, where the only valid
 // values are in the integer range 1-10. An invalid choice is yet again handled with an error message
 // and asking the user to try again.
 int setFierceness() {
+    unsigned int fierceness;
 
+    do {
+        printf("How fierce is your dragon? (1-10): ");
+        scanf("%u", &fierceness);
+
+        if (fierceness > 10)
+            puts("Invalid input! Please enter numbers of the given range.\n");
+
+    } while (fierceness != 'Y' || fierceness != 'N');
+    
+    return fierceness;
 }
 
 // Finally, the program should ask the user to supply between 1-5 colours for the dragon (where
