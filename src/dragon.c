@@ -21,7 +21,18 @@ void insertDragon() {
     char *dragonColor[MAX_COLOURS];
     setDragonColor(dragonColor, &numColors);
     // Insert into database
-
+    // printf("%c", dragonColor[0][0]);
+    // printf("%c", dragonColor[0][1]);
+    // printf("%c", dragonColor[0][2]);
+    printf("\n%s", dragonColor[0]);
+    printf("\n%s", dragonColor[1]);
+    printf("\n%s", dragonColor[2]);
+    printf("\n%s", dragonColor[3]);
+    printf("\n%s", dragonColor[4]);
+    // printf("%s\n", *(dragonColor[1]));
+    // printf("%s\n", *(dragonColor[2]));
+    // printf("%s\n", *(dragonColor[3]));
+    // printf("%s\n", *(dragonColor[4]));
     // When all the dragon’s attributes have been supplied by the user, the dragon should be inserted
     // (entered) into the database, and the user notified about this. The database should assign a
     // unique id to the dragon, when inserting it into the database (the id should not be entered by
@@ -100,8 +111,8 @@ int setFierceness(unsigned int *fierceness) {
 // of colours to enter, prior to entering the colours. Instead, the program should stop asking for
 // additional colours when the user enters an empty string, or when 5 colours have been entered.
 // void setDragonColor(char* dragonColor) {
-void setDragonColor(char *dragonColor[MAX_COLOURS], unsigned int *numColors) {
-    // char *colorArray;
+void setDragonColor(char **dragonColor, unsigned int *numColors) {
+    // char *color;
     char color[NAME_SIZE];
     // char **colorPtr = dragonColor;
     // char *colorPtr[MAX_COLOURS];
@@ -135,10 +146,27 @@ void setDragonColor(char *dragonColor[MAX_COLOURS], unsigned int *numColors) {
             }
 
             // *(colorPtr+i) = malloc(sizeof(color));
-            
+            // printf("%p\n", *(dragonColor+i));
             // *(colorPtr+i) = color;
             // colorPtr[i] = color;
-            *(dragonColor+i) = color;
+            // *(dragonColor+i) = malloc(sizeof(color));
+            // printf("%d\n", sizeof(color));
+            dragonColor[i] = malloc(sizeof(color)*3);
+            if(dragonColor[i] == NULL) {
+                printf("Error: couldn't allocate memory.");
+                exit(-1); // terminate the program
+            }
+            // *(dragonColor+i) = color;
+            for (size_t j = 0; color[j] != '\0'; j++) {
+                dragonColor[i][j] = color[j];
+                // printf("%c", dragonColor[i][j]);
+
+                // *(*(dragonColor+i) + j) = color[j];
+            }
+            
+
+            // printf("\n%s\n", *(dragonColor+i));
+            // printf("%p\n", *(dragonColor+i));
             // colorPtr+colorLength;
         }
     }
@@ -150,7 +178,7 @@ void setDragonColor(char *dragonColor[MAX_COLOURS], unsigned int *numColors) {
 //     char colorInput[NAME_SIZE];
     
 //     for (; count > MAX_COLOURS || *colorInput + count != '\0'; ) {
-//         printf("Please enter between 1-5 colours to the dragon");
+//         printf("PleaseS enter between 1-5 colours to the dragon");
 //         scanf("%s", &colorInput);
 //         dragonColor = colorInput;
 //         count++;

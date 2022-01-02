@@ -4,6 +4,8 @@
 #include "database.h"
 #include "ui.h"
 
+#define MAX_FILENAME 20
+
 int main(void) {
 
     char filename[MAX_FILENAME];
@@ -19,8 +21,8 @@ int main(void) {
     printWelcomeMessage(); // contains welcomeMessage (display mainmenu)
     executeCommands(database); // switch (mainmenu)
 
-    // saveDatabase(filename, database); // database overwritten
-    // destroyDatabase(database); // free database from heap
+    saveDatabase(filename, database); // database overwritten
+    destroyDatabase(database); // free database from heap
     return 0;
 }
 

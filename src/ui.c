@@ -29,7 +29,7 @@ void executeCommands(Database *database) {
             case 5: listDetailedDragons(database); break;
             case 6: showDragonDetail(database); break;
 
-            case 7: break;
+            case 7: listDBStatistics(database); break;
             case 8: break;
 
             case -1:

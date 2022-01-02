@@ -43,7 +43,7 @@ void loadDatabase(char filename[MAX_FILENAME], Database* dB) {
         int colors = dB->dragons[i].numColours;
         for (size_t j = 0; j < colors; j++) {
             dB->dragons[i].colours[j] = malloc(sizeof(NAME_SIZE));
-            // dB->dragons[i].colours[j] = malloc(sizeof(NAME_SIZE));
+            // dB->dragons[i].colours[j] = malloc(sizeof(*fPtr));
             fscanf(fPtr, "%s", dB->dragons[i].colours[j]);
         }
     }
@@ -61,9 +61,9 @@ void destroyDatabase(Database* dB) {
 } // End of function destroyDatabase.
 
 void listDBStatistics(Database* database) {
-    puts("----------------------------------------------------");
+    puts("---------------------------------------------------");
     puts("Size MinFierceness MaxFierceness #Volant #NonVolant");
-    puts("----------------------------------------------------");
+    puts("---------------------------------------------------");
 
     int max_fierceness = 0;
     int min_fierceness = 10;
@@ -80,7 +80,7 @@ void listDBStatistics(Database* database) {
         if (database->dragons[i].isVolant == 'N') nonVolant++;
     }
 
-    printf("%4d %13d %13d %7d %10d", database->size, min_fierceness, max_fierceness, volant, nonVolant);
+    printf("%4d %13d %13d %7d %10d\n", database->size, min_fierceness, max_fierceness, volant, nonVolant);
 }
 
 // void sortDB(Database* database) {

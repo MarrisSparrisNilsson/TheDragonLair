@@ -23,7 +23,7 @@ void setDragonName(char dragonName[NAME_SIZE]);
 // void setDragonName(char *dragonName[NAME_SIZE]);
 char setIsVolant();
 int setFierceness();
-void setDragonColor(char *dragonColor[MAX_COLOURS], unsigned int *numColors);
+void setDragonColor(char **dragonColor, unsigned int *numColors);
 void printDragon(Dragon dragon, enum ListType listType);
 // void printDragon(Dragon dragon, char *listType);
 
