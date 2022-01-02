@@ -1,18 +1,15 @@
 #include <stdio.h>
-// #include "database.h"
+#include "database.h"
 #include "dragon.h"
 #include "ui.h"
 
-
-void executeCommands() { 
-    puts("Welcome to the dragon lair!");
-
+void executeCommands(Database *database) {
     int inputValue = 0;
    
     displayMainMenu(); // Displays the different options you have.
 
     while (inputValue != -1) {
-        printf("?: ");
+        printf("\n?: ");
         scanf("%d", &inputValue);
 
         switch (inputValue) {
@@ -28,23 +25,12 @@ void executeCommands() {
                 
                 break;
             
-            case 4:
-                
-                break;
+            case 4: listBriefDragons(database); break;
+            case 5: listDetailedDragons(database); break;
+            case 6: showDragonDetail(database); break;
 
-            case 5:
-                break;
-
-            case 6:
-                break;
-
-            case 7: 
-                
-                break;
-            
-            case 8:
-                
-                break;
+            case 7: break;
+            case 8: break;
 
             case -1:
                 printf("Have a good one! See ya!");
@@ -69,7 +55,7 @@ void printWelcomeMessage() {
 }
 
 void displayMainMenu() { // Displays the main menu and promtps the user to select an option.
-    puts(
+    printf(
         "\n== Main Menu ==\n"
         "0. Display menu.\n"
         "1. Insert a dragon.\n"
