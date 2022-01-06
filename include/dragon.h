@@ -5,7 +5,7 @@
 
 // #define MAX_COLOURS 5
 #define NAME_SIZE 10
-enum ListType { DETAILED, BREIF };
+enum ListType { DETAILED, BRIEF };
 static enum ListType listType;
 
 
@@ -30,7 +30,10 @@ void printDragon(Dragon dragon, enum ListType listType);
 // void setDragonColor(char *dragonColor[MAX_COLOURS]);
 
 // void updateDragon(Database* database);
-// void deleteDragon(Database* database, Dragon dragon);
+void deleteDragon(Database *database);
+static void stringToUpr(char *string);
+static int findBinaryInterative(int key, int array[], int left, int right);
+static void swapDragon(Database *database, size_t i);
 void listBriefDragons(Database* database);
 void listDetailedDragons(Database* database);
 void showDragonDetail(Database* database);

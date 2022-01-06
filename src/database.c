@@ -12,52 +12,58 @@ Database* createDatabase() {
     return database;
 } // End of function createDatabase.
 
-void loadDatabase(char filename[MAX_FILENAME], Database* dB) {
+void loadDatabase(char filename[MAX_FILENAME], Database* database) {
     FILE *fPtr = fopen(filename, "r");
 
     if (fPtr == NULL) {
         printf("Could not find database");
         exit(-1);
     }
-    
-    // char *size;
-    // fscanf(fPtr, "%s", size);
-    fscanf(fPtr, "%u", &dB->size);
-    // dB->size = strtol(size, &endPtr, 10);
-    // size;
-    // dB->size = size;
-    dB->dragons = malloc(sizeof(Dragon) * dB->size);
-    // dB->dragons->name = malloc((char) NAME_SIZE);
+    fscanf(fPtr, "%u", &database->size);
+    database->dragons = malloc(sizeof(Dragon) * database->size);
     for (size_t i = 0; !feof(fPtr); i++) {
-        fscanf(fPtr, "%u", &dB->dragons[i].id);
-        // fscanf(fPtr, "%s", name);
-        // dB->dragons[i].name = malloc(sizeof(name));
-        // fPtr--;
-        dB->dragons[i].name = malloc(sizeof(char [NAME_SIZE]));
-        fscanf(fPtr, "%s", dB->dragons[i].name);
-        // printf("%d", sizeof(dB->dragons[i].name));
-
-        fscanf(fPtr, "\n%c", &dB->dragons[i].isVolant);
-        fscanf(fPtr, "%u", &dB->dragons[i].fierceness);
-        fscanf(fPtr, "%u", &dB->dragons[i].numColours);
-        int colors = dB->dragons[i].numColours;
+        fscanf(fPtr, "%u", &database->dragons[i].id);
+        database->dragons[i].name = malloc(sizeof(char [NAME_SIZE]));
+        fscanf(fPtr, "%s", database->dragons[i].name);
+        fscanf(fPtr, "\n%c", &database->dragons[i].isVolant);
+        fscanf(fPtr, "%u", &database->dragons[i].fierceness);
+        fscanf(fPtr, "%u", &database->dragons[i].numColours);
+        int colors = database->dragons[i].numColours;
         for (size_t j = 0; j < colors; j++) {
-            dB->dragons[i].colours[j] = malloc(sizeof(NAME_SIZE));
-            // dB->dragons[i].colours[j] = malloc(sizeof(*fPtr));
-            fscanf(fPtr, "%s", dB->dragons[i].colours[j]);
+            database->dragons[i].colours[j] = malloc(sizeof(NAME_SIZE));
+            fscanf(fPtr, "%s", database->dragons[i].colours[j]);
         }
     }
 }
 
-void saveDatabase(char *filename, Database* dB) {
+void saveDatabase(char *filename, Database* database) {
+    FILE *fPtr = fopen(filename, "w");
 
+    if (fPtr == NULL) {
+        printf("Could not find database");
+        exit(-1);
+    }
+    fprintf(fPtr, "%u\n", database->size);
+    for (size_t i = 0; i < database->size; i++) {
+        fprintf(fPtr, "%u\n", database->dragons[i].id);
+        fprintf(fPtr, "%s\n", database->dragons[i].name);
+        fprintf(fPtr, "%c\n", database->dragons[i].isVolant);
+        fprintf(fPtr, "%u\n", database->dragons[i].fierceness);
+        fprintf(fPtr, "%u\n", database->dragons[i].numColours);
+        int colors = database->dragons[i].numColours;
+        for (size_t j = 0; j < colors; j++) {
+            fprintf(fPtr, "%s\n", database->dragons[i].colours[j]);
+        }
+        fprintf(fPtr, "%u\n", database->nextId);
+    }
+    fclose(fPtr);
 }
 // Start of function destroyDatabase.
-void destroyDatabase(Database* dB) {
-    if(dB != NULL) {
-        free(dB); // Deallocates the memory for the fMatrix on the heap.
+void destroyDatabase(Database* database) {
+    if(database != NULL) {
+        free(database); // Deallocates the memory for the fMatrix on the heap.
     }
-    dB = NULL; // Sets the fMatrix to NULL.
+    database = NULL; // Sets the fMatrix to NULL.
 } // End of function destroyDatabase.
 
 void listDBStatistics(Database* database) {
