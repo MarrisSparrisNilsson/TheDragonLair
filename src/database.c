@@ -87,12 +87,12 @@ void saveDatabase(char *filename, Database* database) {
 void destroyDatabase(Database* database) {
     if(database != NULL) {
         if (database->dragons != NULL) {
-            for (size_t i = 0; i < database->size; i++) {
-                free(database->dragons[i].name);
-                for (size_t j = 0; j < database->dragons[i].numColours; j++) {
-                    free(database->dragons[i].colours[j]);
-                }
-            }
+            // for (size_t i = 0; i < database->size; i++) {
+            //     free(database->dragons[i].name);
+            //     for (size_t j = 0; j < database->dragons[i].numColours; j++) {
+            //         free(database->dragons[i].colours[j]);
+            //     }
+            // }
             free(database->dragons);
         }
         free(database);

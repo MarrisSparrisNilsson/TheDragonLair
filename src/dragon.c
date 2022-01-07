@@ -153,95 +153,106 @@ void updateDragon(Database* database) {
 
 void deleteDragon(Database *database) {
 
-    int nextId = 0;
+    bool foundDragon = false;
     char dragon[NAME_SIZE];
     char *endPtr = NULL;
-    bool foundDragon = false;
 
-    printf("Please enter a id or a name of the dragon you want to delete: ");
-    scanf("%s", dragon);
+    while (!foundDragon) {
+        printf("Please enter a id or a name of the dragon you want to delete: ");
+        scanf("%s", dragon);
 
-    if (isdigit(dragon[0])) {
-        int dragonID = strtol(dragon, &endPtr, 10);
-        for (size_t i = 0; i < database->size; i++) {
-            if (dragonID == database->dragons[i].id) {
-                for (size_t i = dragonID; i < database->size; i++) {
-                    swapDragon(database, i);
-                    nextId = i;
+        if (isdigit(dragon[0])) {
+            int dragonID = strtol(dragon, &endPtr, 10);
+            for (size_t i = 0; i < database->size; i++) {
+                if (dragonID == database->dragons[i].id) {
+                    for (size_t j = i; j < database->size; j++) {
+                        swapDragon(database, j, j+1);
+                    }
+                    foundDragon = true;
+                    printf("The dragon with id: %d has been deleted!\n", dragonID);
                 }
-                foundDragon = true;
-                printf("The dragon with id: %d has been deleted!\n", i+1);
             }
+            if (foundDragon) database->size--;
         }
-        database->size--;
-    }
-    else if (isalpha(dragon[0])) {
-            stringToUpr(dragon);
-                puts("--------------------------------------------------------------------------------");
-                puts("ID Name");
-                puts("--------------------------------------------------------------------------------");
-                int count = 0;
-                int *array = malloc(sizeof(database->size)+1);
-                int j = 0;
-                for (size_t h = 0; h < database->size; h++) {
-                    if (strcmp(dragon, database->dragons[h].name) == 0) {
-                        array[j] = database->dragons[h].id;
-                        printDragon(database->dragons[h], BRIEF);
-                        count++;
-                        j++;
-                    }
-                }
-                array[j] = -1;
-                foundDragon = true;
-                if (count > 1) {
-                        int dragonID = 0;
-                        int matchingID = -1;
-                        int arraySize = 0;
-                        for (size_t i = 0; array[i+1] != -1; i++) arraySize++;
-                    while (matchingID == -1) {
-                        int i;
-                        printf("Please choose which id matching the dragon you want to delete: ");
-                        scanf("%d", &dragonID);
-                        matchingID = findBinaryInterative(dragonID, array, 0, arraySize-1);
-                        if (matchingID != -1) {
-                            printf("The dragon with id: %d has been deleted!\n", dragonID);
-                            for (size_t i = dragonID; i < database->size; i++) {
-                                swapDragon(database, i);
-                                nextId = i;
-                            }
+        else if (isalpha(dragon[0])) {
+                stringToUpr(dragon);
+                    puts("--------------------------------------------------------------------------------");
+                    puts("ID Name");
+                    puts("--------------------------------------------------------------------------------");
+                    int martin;
+                    int j = 0;
+                    int *idxArray = malloc(sizeof(database->size)+1);
+                    int dragonID = 0;
+                    for (size_t h = 0; h < database->size; h++) {
+                        if (strcmp(dragon, database->dragons[h].name) == 0) {
+                            // idxArray[j] = h;
+                            martin = h;
+                            printDragon(database->dragons[h], BRIEF);
+                            foundDragon = true;
+                            j++;
                         }
-                        else puts("Invalid input, please try again");
                     }
-                }
-                else {
-                    for (size_t i = array[0]; i < database->size; i++) {
-                        swapDragon(database, i);
-                        nextId = i;
+                    if (j > 1) {
+                            int matchingIDidx = -1;
+                        while (matchingIDidx == -1) {
+                            printf("Please choose which id matching the dragon you want to delete: ");
+                            fflush(stdin);
+                            scanf("%d", &dragonID);
+                            for (size_t i = 0; i < database->size; i++) {
+                                if (dragonID == database->dragons[i].id) {
+                                    matchingIDidx = i;
+                                }
+                            }
+                            if (matchingIDidx != -1) {
+                                printf("The dragon with id: %d has been deleted!\n", dragonID);
+                                for (size_t i = matchingIDidx; i < database->size; i++) {
+                                    swapDragon(database, i, i+1);
+                                }
+                            }
+                            else puts("Couldn't find dragon match, please try again!");
+                        }
                     }
-                    printf("The dragon with name: %s has been deleted!\n", dragon);
-                }
-        database->size--;
-        database->nextId = nextId + 1;
+                    else {
+                        for (size_t i = martin; i < database->size; i++) {
+                            swapDragon(database, i, i+1);
+                        }
+                        if (foundDragon) printf("The dragon with name: %s has been deleted!\n", dragon);
+                    }
+            if (foundDragon) database->size--;
+        }
+        if (!foundDragon) puts("Could not find a matching dragon, please try again!");
     }
-    else printf("Invalid input.");
-    if (!foundDragon) printf("Could not find a matching dragon.");
 }
 
-static int findBinaryInterative(int dragonID, int array[], int left, int right) {
-    while (left <= right) {
-        int mid = (left + right) / 2;
-        // If dragonID is present at mid (split point)
-        if (dragonID == array[mid])
-        return mid;
-        // If dragonID > mid-entry, skip left subarray
-        if (dragonID > array[mid])
-        left = mid + 1;
-        // If dragonID < mid-entry, skip right subarray
-        else
-        right = mid - 1;
-    }
-    return -1; // DragonID not in array
-}
+// static int findLinear(int key, int array[], size_t size)
+// {
+// int i;
+// // Loop through all elements (first to last)
+// for (i = 0; i < size; i++)
+// {
+// // If key found return its index
+// if (key == array[i])
+// return i;
+// }
+// return -1; // Key not found
+// }
+
+// static int findBinaryInterative(int dragonID, int idxArray[], int left, int right) {
+//     while (left <= right) {
+//         int mid = (left + right) / 2;
+//         printf("%d\n", idxArray[mid]);
+//         // If dragonID is present at mid (split point)
+//         if (dragonID == idxArray[mid])
+//         return mid;
+//         // If dragonID > mid-entry, skip left subarray
+//         if (dragonID > idxArray[mid])
+//         left = mid + 1;
+//         // If dragonID < mid-entry, skip right subarray
+//         else
+//         right = mid - 1;
+//     }
+//     return -1; // DragonID not in array
+// }
 
 static void stringToUpr(char *string) {
     for (size_t i = 0; string[i] != '\0'; i++) {
@@ -249,18 +260,25 @@ static void stringToUpr(char *string) {
     }
 }
 
+// Start of function swap.
+static void swapDragon(Database *database, int id1, int id2) { // Swaps elements in an intArray.
+    Dragon tempDragon = database->dragons[id1];
+    database->dragons[id1] = database->dragons[id2];
+    database->dragons[id2] = tempDragon;
+} // End of function swap.
+
 // SIMPLIFY
-static void swapDragon(Database *database, size_t i) {
-    database->dragons[i-1].name = database->dragons[i].name;
-    database->dragons[i-1].id = database->dragons[i].id;
-    database->dragons[i-1].isVolant = database->dragons[i].isVolant;
-    database->dragons[i-1].fierceness = database->dragons[i].fierceness;
-    database->dragons[i-1].numColours = database->dragons[i].numColours;
-    for (size_t j = 0; j < database->dragons[i].numColours; j++) {
-        database->dragons[i-1].colours[j] = malloc(sizeof(NAME_SIZE));
-        database->dragons[i-1].colours[j] = database->dragons[i].colours[j];
-    }
-}
+// static void swapDragon(Database *database, size_t i) {
+//     database->dragons[i-1].name = database->dragons[i].name;
+//     database->dragons[i-1].id = database->dragons[i].id;
+//     database->dragons[i-1].isVolant = database->dragons[i].isVolant;
+//     database->dragons[i-1].fierceness = database->dragons[i].fierceness;
+//     database->dragons[i-1].numColours = database->dragons[i].numColours;
+//     for (size_t j = 0; j < database->dragons[i].numColours; j++) {
+//         database->dragons[i-1].colours[j] = malloc(sizeof(NAME_SIZE));
+//         database->dragons[i-1].colours[j] = database->dragons[i].colours[j];
+//     }
+// }
 
 void listBriefDragons(Database* database) {
     puts("--------------------------------------------------------------------------------");
