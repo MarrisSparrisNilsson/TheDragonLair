@@ -1,9 +1,9 @@
 #ifndef _ui_h
 #define _ui_h
 
-#include "database.h"
+#include "dBstructs.h"
 
-void executeCommands();
+void executeCommands(Database *database);
 void printWelcomeMessage();
 void displayMainMenu();
 

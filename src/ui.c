@@ -1,58 +1,30 @@
 #include <stdio.h>
-// #include "database.h"
+#include "database.h"
 #include "dragon.h"
 #include "ui.h"
 
-
-void executeCommands() { 
-    puts("Welcome to the dragon lair!");
-
+void executeCommands(Database *database) {
     int inputValue = 0;
    
     displayMainMenu(); // Displays the different options you have.
 
     while (inputValue != -1) {
-        printf("?: ");
+        printf("\n?: ");
         scanf("%d", &inputValue);
 
         switch (inputValue) {
             
             case 0: displayMainMenu(); break;
-            case 1: insertDragon(); break;
-
-            case 2: 
-            
-                break;
-                
-            case 3:
-                
-                break;
-            
-            case 4:
-                
-                break;
-
-            case 5:
-                break;
-
-            case 6:
-                break;
-
-            case 7: 
-                
-                break;
-            
-            case 8:
-                
-                break;
-
-            case -1:
-                printf("Have a good one! See ya!");
-                break;
-
-            default:
-                puts("Invalid selection. Please try again.!\n");
-                break;   
+            case 1: insertDragon(database); break;
+            case 2: break;
+            case 3: deleteDragon(database); break;
+            case 4: listBriefDragons(database); break;
+            case 5: listDetailedDragons(database); break;
+            case 6: showDragonDetail(database); break;
+            case 7: listDBStatistics(database); break;
+            case 8: break;
+            case -1: printf("Have a good one! See ya!"); break;
+            default: puts("Invalid selection. Please try again.!\n"); break;   
         }
     }
 } // End of the function executeCommands
@@ -69,7 +41,7 @@ void printWelcomeMessage() {
 }
 
 void displayMainMenu() { // Displays the main menu and promtps the user to select an option.
-    puts(
+    printf(
         "\n== Main Menu ==\n"
         "0. Display menu.\n"
         "1. Insert a dragon.\n"

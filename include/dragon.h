@@ -1,30 +1,29 @@
 #ifndef _dragon_h
 #define _dragon_h
 
-#define MAX_COLOURS 5
+#include "dBstructs.h"
+
 #define NAME_SIZE 10
+enum ListType { DETAILED, BRIEF };
 
-typedef struct Dragon {
-    unsigned int id;
-    char *name;
-    char isVolant;
-    unsigned int fierceness;
-    unsigned int numColours;
-    char *colours[MAX_COLOURS];
-} Dragon;
+void insertDragon(Database *database);
+static void setDragonName(Database *database, unsigned int dragonIndex);
+static char setIsVolant(Database *database, unsigned int dragonIndex);
+static int setFierceness(Database *database, unsigned int dragonIndex);
+static void setDragonColor(Database * database, unsigned int dragonIndex);
+static void formatColorStr(char *string);
 
-void insertDragon();
-void setDragonName(char dragonName[NAME_SIZE]);
-// void setDragonName(char *dragonName[NAME_SIZE]);
-char setIsVolant();
-int setFierceness();
-void setDragonColor(char dragonColor[MAX_COLOURS]);
-// void setDragonColor(char *dragonColor[MAX_COLOURS]);
 
-// void updateDragon(Database* database, Dragon dragon);
-// void deleteDragon(Database* database, Dragon dragon);
-// void listBriefDragons(Database* database, Dragon dragon);
-// void listDetailedDragons(Database* database, Dragon dragon);
-// void showDragonDetail(Database* database, Dragon dragon);
+// void updateDragon(Database* database);
+void deleteDragon(Database *database);
+static void stringToUpr(char *string);
+static int findBinaryInterative(int key, int array[], int left, int right);
+static void swapDragon(Database *database, size_t i);
+void listBriefDragons(Database* database);
+void listDetailedDragons(Database* database);
+void showDragonDetail(Database* database);
+static void findDragon(char dragon[NAME_SIZE], Database *database, Dragon *dragonArray);
+static void printDragon(Dragon dragon, enum ListType listType);
+
 
 #endif
