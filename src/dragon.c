@@ -3,51 +3,20 @@
 #include <stdbool.h>
 #include <ctype.h>
 #include <string.h>
-// #include "database.h"
 #include "dragon.h"
 
 void insertDragon(Database *database) {
-
-    // char *dragonName[NAME_SIZE];
-    // char *dragonName;
-    // char dragonName[NAME_SIZE];
-    // setDragonName(dragonName);
+    
     setDragonName(database, database->size);
-    // char isVolant;
-    // setIsVolant(&isVolant);
     setIsVolant(database, database->size);
-    // unsigned int fierceness;
     setFierceness(database, database->size);
-    // char dragonColor[MAX_COLOURS];
-    unsigned int numColors = 0;
-    char *dragonColor[MAX_COLOURS];
-    // printf("%p\n", dragonColor);
-    // printf("%p", *dragonColor);
-    // setDragonColor(dragonColor, &numColors);
     setDragonColor(database, database->size);
 
     database->dragons[database->size].id = database->nextId;
     printf("The dragon %s was entered into the database!", database->dragons[database->size].name);
+
     database->size++;
     database->nextId++;
-
-    // Insert into database
-    // printf("%c", dragonColor[0][0]);
-    // printf("%c", dragonColor[0][1]);
-    // printf("%c", dragonColor[0][2]);
-    // printf("%p\n", *dragonColor);
-    // for (size_t i = 0; i < numColors; i++) {
-    //     printf("%s\n", dragonColor[i]);
-    // }
-    
-    // printf("%s\n", *(dragonColor[1]));
-    // printf("%s\n", *(dragonColor[2]));
-    // printf("%s\n", *(dragonColor[3]));
-    // printf("%s\n", *(dragonColor[4]));
-
-    // database->dragons[database->nextId].id = database->nextId;
-    // database->dragons[database->nextId].name = dragonName;
-    // database->dragons[database->nextId].isVolant = isVolant;
 
     // When all the dragon’s attributes have been supplied by the user, the dragon should be inserted
     // (entered) into the database, and the user notified about this. The database should assign a
@@ -60,8 +29,6 @@ void insertDragon(Database *database) {
 // enter the dragon’s name (i.e. a string only containing letters from the English alphabet).
 // If the user doesn’t enter a valid name (i.e. anything but letters from the English alphabet), the
 // program should output an error message and ask the user to try again.
-// void setDragonName(char *dragonName) {
-// static void setDragonName(char dragonName[NAME_SIZE]) {
 static void setDragonName(Database *database, unsigned int dragonIndex) {
     char dragonName[NAME_SIZE];
     bool isValidName = false;
@@ -257,6 +224,7 @@ void deleteDragon(Database *database) {
     else printf("Invalid input.");
     if (!foundDragon) printf("Could not find a matching dragon.");
 }
+
 static int findBinaryInterative(int dragonID, int array[], int left, int right) {
     while (left <= right) {
         int mid = (left + right) / 2;
@@ -279,6 +247,7 @@ static void stringToUpr(char *string) {
     }
 }
 
+// SIMPLIFY
 static void swapDragon(Database *database, size_t i) {
     database->dragons[i-1].name = database->dragons[i].name;
     database->dragons[i-1].id = database->dragons[i].id;
@@ -290,39 +259,6 @@ static void swapDragon(Database *database, size_t i) {
         database->dragons[i-1].colours[j] = database->dragons[i].colours[j];
     }
 }
-static int findBinaryInterative(int key, int array[], int left, int right) {
-    while (left <= right) {
-        int mid = (left + right) / 2;
-        // If key is present at mid (split point)
-        if (key == array[mid])
-        return mid;
-        // If key > mid-entry, skip left subarray
-        if (key > array[mid])
-        left = mid + 1;
-        // If key < mid-entry, skip right subarray
-        else
-        right = mid - 1;
-    }
-    return -1; // Key not in array
-}
-
-static void stringToUpr(char *string) {
-    for (size_t i = 0; string[i] != '\0'; i++) {
-        string[i] = toupper(string[i]);
-    }
-}
-
-static void swapDragon(Database *database, size_t i) {
-    database->dragons[i-1].name = database->dragons[i].name;
-    database->dragons[i-1].id = database->dragons[i].id;
-    database->dragons[i-1].isVolant = database->dragons[i].isVolant;
-    database->dragons[i-1].fierceness = database->dragons[i].fierceness;
-    database->dragons[i-1].numColours = database->dragons[i].numColours;
-    for (size_t j = 0; j < database->dragons[i].numColours; j++) {
-        database->dragons[i-1].colours[j] = malloc(sizeof(NAME_SIZE));
-        database->dragons[i-1].colours[j] = database->dragons[i].colours[j];
-    }
-} 
 
 void listBriefDragons(Database* database) {
     puts("--------------------------------------------------------------------------------");
