@@ -21,9 +21,10 @@
 // } Database;
 
 Database* createDatabase();
-void destroyDatabase(Database*);
-void loadDatabase(char *filename, Database*);
-void saveDatabase(char *filename, Database*);
+void destroyDatabase(Database *database);
+void loadDatabase(char *filename, Database *database);
+static void expandDB(Database *database);
+void saveDatabase(char *filename, Database *database);
 void listDBStatistics(Database* database);
 void sortDB(Database* database);
 

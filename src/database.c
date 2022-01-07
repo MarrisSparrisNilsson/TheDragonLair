@@ -1,63 +1,103 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "database.h"
 
 // Start of function createDatabase.
 Database* createDatabase() {
-    Database *database = (Database*) malloc(sizeof(Database)); // Allocates memory on the heap for a Database.
-    if (database == NULL) return NULL;
+    Database *dBPtr = (Database*) malloc(sizeof(Database)); // Allocates memory on the heap for a Database.
+    if (dBPtr == NULL) return NULL;
 
-    database->capacity = INITIAL_CAPACITY;
+    dBPtr->dragons = (Dragon*) calloc(INITIAL_CAPACITY, sizeof(Dragon)); // Allocates memory on the heap for a Database.
+    if (dBPtr->dragons == NULL) return NULL;
 
-    return database;
+    dBPtr->capacity = INITIAL_CAPACITY;
+    dBPtr->size = 0;
+    dBPtr->nextId = 1;
+
+    return dBPtr;
 } // End of function createDatabase.
 
-void loadDatabase(char filename[MAX_FILENAME], Database* dB) {
+void loadDatabase(char filename[MAX_FILENAME], Database* database) {
     FILE *fPtr = fopen(filename, "r");
 
     if (fPtr == NULL) {
         printf("Could not find database");
         exit(-1);
     }
-    
-    // char *size;
-    // fscanf(fPtr, "%s", size);
-    fscanf(fPtr, "%u", &dB->size);
-    // dB->size = strtol(size, &endPtr, 10);
-    // size;
-    // dB->size = size;
-    dB->dragons = malloc(sizeof(Dragon) * dB->size);
-    // dB->dragons->name = malloc((char) NAME_SIZE);
-    for (size_t i = 0; !feof(fPtr); i++) {
-        fscanf(fPtr, "%u", &dB->dragons[i].id);
-        // fscanf(fPtr, "%s", name);
-        // dB->dragons[i].name = malloc(sizeof(name));
-        // fPtr--;
-        dB->dragons[i].name = malloc(sizeof(char [NAME_SIZE]));
-        fscanf(fPtr, "%s", dB->dragons[i].name);
-        // printf("%d", sizeof(dB->dragons[i].name));
 
-        fscanf(fPtr, "\n%c", &dB->dragons[i].isVolant);
-        fscanf(fPtr, "%u", &dB->dragons[i].fierceness);
-        fscanf(fPtr, "%u", &dB->dragons[i].numColours);
-        int colors = dB->dragons[i].numColours;
-        for (size_t j = 0; j < colors; j++) {
-            dB->dragons[i].colours[j] = malloc(sizeof(NAME_SIZE));
-            // dB->dragons[i].colours[j] = malloc(sizeof(*fPtr));
-            fscanf(fPtr, "%s", dB->dragons[i].colours[j]);
+    fscanf(fPtr, "%u\n", &database->size);
+
+    // while (database->size > database->capacity) {
+    //     expandDB(database);
+    // }
+
+    for (size_t i = 0; i < database->size; i++) {
+        fscanf(fPtr, "%u\n", &database->dragons[i].id);
+
+        database->dragons[i].name = malloc(sizeof(char [NAME_SIZE]));
+        fscanf(fPtr, "%s\n", database->dragons[i].name);
+        fscanf(fPtr, "%c\n", &database->dragons[i].isVolant);
+        fscanf(fPtr, "%u\n", &database->dragons[i].fierceness);
+        fscanf(fPtr, "%u\n", &database->dragons[i].numColours);
+        for (size_t j = 0; j < database->dragons[i].numColours; j++) {
+            database->dragons[i].colours[j] = malloc(sizeof(NAME_SIZE));
+            fscanf(fPtr, "%s\n", database->dragons[i].colours[j]);
         }
     }
+    fscanf(fPtr, "%u\n", &database->nextId);
+    fclose(fPtr);
 }
 
-void saveDatabase(char *filename, Database* dB) {
+// Each time a dragon is added to the database (i.e. the dynamic array dragons),
+// the database’s size is incremented. Then, when the database’s size reaches its current capacity,
+// the database is grown as described above. To do this, you can use the functions malloc or realloc
+// in stdlib.h.
 
-}
-// Start of function destroyDatabase.
-void destroyDatabase(Database* dB) {
-    if(dB != NULL) {
-        free(dB); // Deallocates the memory for the fMatrix on the heap.
+// static void expandDB(Database *database) {
+//     Dragon *dragonPtr = (Dragon*) calloc(GROWTH_FACTOR * database->capacity, sizeof(Dragon));
+//     if (dragonPtr == NULL) {
+//         printf("Could not expand database");
+//     };
+// }
+
+void saveDatabase(char *filename, Database* database) {
+    FILE *fPtr = fopen(filename, "w");
+
+    if (fPtr == NULL) {
+        printf("Could not find database");
+        exit(-1);
     }
-    dB = NULL; // Sets the fMatrix to NULL.
+    fprintf(fPtr, "%u\n", database->size);
+    for (size_t i = 0; i < database->size; i++) {
+        fprintf(fPtr, "%u\n", database->dragons[i].id);
+        fprintf(fPtr, "%s\n", database->dragons[i].name);
+        fprintf(fPtr, "%c\n", database->dragons[i].isVolant);
+        fprintf(fPtr, "%u\n", database->dragons[i].fierceness);
+        fprintf(fPtr, "%u\n", database->dragons[i].numColours);
+        int colors = database->dragons[i].numColours;
+        for (size_t j = 0; j < colors; j++) {
+            fprintf(fPtr, "%s\n", database->dragons[i].colours[j]);
+        }
+    }
+    fprintf(fPtr, "%u\n", database->nextId);
+    fclose(fPtr);
+}
+
+void destroyDatabase(Database* database) {
+    if(database != NULL) {
+        if (database->dragons != NULL) {
+            for (size_t i = 0; i < database->size; i++) {
+                free(database->dragons[i].name);
+                for (size_t j = 0; j < database->dragons[i].numColours; j++) {
+                    free(database->dragons[i].colours[j]);
+                }
+            }
+            free(database->dragons);
+        }
+        free(database);
+    }
+    database = NULL; // Sets the database to NULL.
 } // End of function destroyDatabase.
 
 void listDBStatistics(Database* database) {
@@ -87,21 +127,7 @@ void listDBStatistics(Database* database) {
 
 // }
 
-// Each time a dragon is added to the database (i.e. the dynamic array dragons),
-// the database’s size is incremented. Then, when the database’s size reaches its current capacity,
-// the database is grown as describe above. To do this, you can use the functions malloc or realloc
-// in stdlib.h.
-
 void getDatabaseFilename(char filename[MAX_FILENAME]) {
-
     printf("Please enter filename: ");
     scanf("%s", filename);
-
-    // FILE *fPtrText = fopen("filename", "w");
-    
-    // for(int i=0; i<MAX_FILENAME; ++i) {
-    //     fprintf(fPtrText, "%d %.1f %c %s\n",
-    //     data[i].d, data[i].f, data[i].c, data[i].s);
-    // }
-    // fclose(fPtrText);
 }   
