@@ -7,13 +7,15 @@
 
 void insertDragon(Database *database) {
     
-    setDragonName(database, database->size);
-    setIsVolant(database, database->size);
-    setFierceness(database, database->size);
-    setDragonColor(database, database->size);
+    int dragonIndex = database->size;
+    
+    setDragonName(database, dragonIndex);
+    setIsVolant(database, dragonIndex);
+    setFierceness(database, dragonIndex);
+    setDragonColor(database, dragonIndex);
 
-    database->dragons[database->size].id = database->nextId;
-    printf("The dragon %s was entered into the database!", database->dragons[database->size].name);
+    database->dragons[dragonIndex].id = database->nextId;
+    printf("The dragon %s was entered into the database!", database->dragons[dragonIndex].name);
 
     database->size++;
     database->nextId++;
