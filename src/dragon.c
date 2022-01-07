@@ -7,6 +7,9 @@
 
 void insertDragon(Database *database) {
     
+    if (database->size+1 > database->capacity) {
+        // expand
+    }
     int dragonIndex = database->size;
     
     setDragonName(database, dragonIndex);
@@ -36,17 +39,22 @@ static void setDragonName(Database *database, unsigned int dragonIndex) {
     bool isValidName = false;
 
     while (!isValidName) {
+        isValidName = true;
         printf("Please enter the name of your dragon: ");
+        fflush(stdin);
         scanf("%10s", dragonName);
         
-        for (size_t i = 0; dragonName[i] != '\0'; i++) {
+        size_t i = 0;
+        while (dragonName[i] != '\0' && isValidName) {
             if (!isalpha((dragonName[i]))) { // If the character on position i is NOT an alpha character, the name is invalid.
+                isValidName = false;
                 puts("\nInvalid name! Allowed characters are: (A-Z, a-z).\n");
-                isValidName == false;
-                break;
-            }        
-            isValidName = true;
-            dragonName[i] = toupper(dragonName[i]);
+            }
+            else { 
+                isValidName = true;
+                dragonName[i] = toupper(dragonName[i]);
+                i++;
+            }
         }
     }
     database->dragons[dragonIndex].name = malloc(sizeof(char [NAME_SIZE]));
@@ -82,6 +90,7 @@ static int setFierceness(Database *database, unsigned int dragonIndex) {
     unsigned int fierceness;
     do {
         printf("How fierce is your dragon? (1-10): ");
+        fflush(stdin);
         scanf("%u", &fierceness);
 
         if (fierceness > 10)
@@ -98,6 +107,7 @@ static void setDragonColor(Database *database, unsigned int dragonIndex) {
     char color[NAME_SIZE];
 
     while (numColours < MAX_COLOURS) {
+        bool isValidInput = true;
         printf("Please enter dragon color #%d (of 5): ", numColours+1);
         fflush(stdin);
         fgets(color, sizeof(color), stdin);
@@ -109,23 +119,28 @@ static void setDragonColor(Database *database, unsigned int dragonIndex) {
             puts("Please enter atleast one color!\n");
         else if (numColours > 0 && color[0] == '\0') break;
         else {
-            formatColorStr(color);
+            formatColorStr(color, &isValidInput);
             database->dragons[dragonIndex].colours[numColours] = malloc(sizeof(char) * colorLength);
             strcpy(database->dragons[dragonIndex].colours[numColours], color);
 
-            numColours++;
+            if (isValidInput) numColours++;
         }
     }
     database->dragons[dragonIndex].numColours = numColours;
 }
 
-static void formatColorStr(char *string) {
-    for (size_t i = 0; string[i] != '\0'; i++) {
+static void formatColorStr(char *string, bool *isValidInput) {
+    int i = 0;
+    while (string[i] != '\0' && *isValidInput) {
         if (!isalpha(string[i])) {
-            puts("Invalid input! Color must contain characters of A-Z");
-            break;
+            puts("Invalid input! Colour must contain characters of A-Z");
+            *isValidInput = false;
         }
-        string[i] = toupper(string[i]);
+        else {
+            string[i] = toupper(string[i]);
+            i++;
+            *isValidInput = true;
+        }
     }
 }
 
@@ -155,104 +170,51 @@ void deleteDragon(Database *database) {
 
     bool foundDragon = false;
     char dragon[NAME_SIZE];
-    char *endPtr = NULL;
+    int dragonIdx = -1;
 
     while (!foundDragon) {
         printf("Please enter a id or a name of the dragon you want to delete: ");
+        fflush(stdin);
         scanf("%s", dragon);
 
+
         if (isdigit(dragon[0])) {
-            int dragonID = strtol(dragon, &endPtr, 10);
-            for (size_t i = 0; i < database->size; i++) {
-                if (dragonID == database->dragons[i].id) {
-                    for (size_t j = i; j < database->size; j++) {
-                        swapDragon(database, j, j+1);
+            dragonIdx = getDragonIndex(dragon, database, &foundDragon);
+            printf("The dragon with id %d has been deleted!\n", database->dragons[dragonIdx].id);
+            swapDragon(database, dragonIdx);
+        }
+        else {
+            stringToUpr(dragon);
+            printHeader(BRIEF);
+            int numDragons = 0;
+
+            dragonIdx = getDragonIndex(dragon, database, &foundDragon);
+            printDragons(dragon, database, dragonIdx, &numDragons, BRIEF);
+
+            if (numDragons > 1) {
+                dragonIdx = -1;
+                while (dragonIdx == -1) {
+                    printf("Please choose which id matching the dragon you want to delete: ");
+                    fflush(stdin);
+                    scanf("%s", &dragon);
+
+                    dragonIdx = getDragonIndex(dragon, database, &foundDragon);
+                    if (dragonIdx != -1) {
+                        printf("The dragon with id: %d has been deleted!\n", database->dragons[dragonIdx].id);
+                        swapDragon(database, dragonIdx);
                     }
-                    foundDragon = true;
-                    printf("The dragon with id: %d has been deleted!\n", dragonID);
+                    else puts("Couldn't find dragon match, please try again!");
                 }
             }
-            if (foundDragon) database->size--;
+            else {
+                swapDragon(database, dragonIdx);
+                if (foundDragon) printf("The dragon with name %s has been deleted!\n", dragon);
+            }
         }
-        else if (isalpha(dragon[0])) {
-                stringToUpr(dragon);
-                    puts("--------------------------------------------------------------------------------");
-                    puts("ID Name");
-                    puts("--------------------------------------------------------------------------------");
-                    int martin;
-                    int j = 0;
-                    int *idxArray = malloc(sizeof(database->size)+1);
-                    int dragonID = 0;
-                    for (size_t h = 0; h < database->size; h++) {
-                        if (strcmp(dragon, database->dragons[h].name) == 0) {
-                            // idxArray[j] = h;
-                            martin = h;
-                            printDragon(database->dragons[h], BRIEF);
-                            foundDragon = true;
-                            j++;
-                        }
-                    }
-                    if (j > 1) {
-                            int matchingIDidx = -1;
-                        while (matchingIDidx == -1) {
-                            printf("Please choose which id matching the dragon you want to delete: ");
-                            fflush(stdin);
-                            scanf("%d", &dragonID);
-                            for (size_t i = 0; i < database->size; i++) {
-                                if (dragonID == database->dragons[i].id) {
-                                    matchingIDidx = i;
-                                }
-                            }
-                            if (matchingIDidx != -1) {
-                                printf("The dragon with id: %d has been deleted!\n", dragonID);
-                                for (size_t i = matchingIDidx; i < database->size; i++) {
-                                    swapDragon(database, i, i+1);
-                                }
-                            }
-                            else puts("Couldn't find dragon match, please try again!");
-                        }
-                    }
-                    else {
-                        for (size_t i = martin; i < database->size; i++) {
-                            swapDragon(database, i, i+1);
-                        }
-                        if (foundDragon) printf("The dragon with name: %s has been deleted!\n", dragon);
-                    }
-            if (foundDragon) database->size--;
-        }
-        if (!foundDragon) puts("Could not find a matching dragon, please try again!");
+        if (foundDragon) database->size--;
+        else puts("Could not find a matching dragon, please try again!\n");
     }
 }
-
-// static int findLinear(int key, int array[], size_t size)
-// {
-// int i;
-// // Loop through all elements (first to last)
-// for (i = 0; i < size; i++)
-// {
-// // If key found return its index
-// if (key == array[i])
-// return i;
-// }
-// return -1; // Key not found
-// }
-
-// static int findBinaryInterative(int dragonID, int idxArray[], int left, int right) {
-//     while (left <= right) {
-//         int mid = (left + right) / 2;
-//         printf("%d\n", idxArray[mid]);
-//         // If dragonID is present at mid (split point)
-//         if (dragonID == idxArray[mid])
-//         return mid;
-//         // If dragonID > mid-entry, skip left subarray
-//         if (dragonID > idxArray[mid])
-//         left = mid + 1;
-//         // If dragonID < mid-entry, skip right subarray
-//         else
-//         right = mid - 1;
-//     }
-//     return -1; // DragonID not in array
-// }
 
 static void stringToUpr(char *string) {
     for (size_t i = 0; string[i] != '\0'; i++) {
@@ -261,29 +223,16 @@ static void stringToUpr(char *string) {
 }
 
 // Start of function swap.
-static void swapDragon(Database *database, int id1, int id2) { // Swaps elements in an intArray.
-    Dragon tempDragon = database->dragons[id1];
-    database->dragons[id1] = database->dragons[id2];
-    database->dragons[id2] = tempDragon;
+static void swapDragon(Database *database, int startIdx) { // Swaps elements in an intArray.
+    for (size_t i = startIdx; i < database->size; i++) {
+        Dragon tempDragon = database->dragons[i];
+        database->dragons[i] = database->dragons[i+1];
+        database->dragons[i+1] = tempDragon;
+    }
 } // End of function swap.
 
-// SIMPLIFY
-// static void swapDragon(Database *database, size_t i) {
-//     database->dragons[i-1].name = database->dragons[i].name;
-//     database->dragons[i-1].id = database->dragons[i].id;
-//     database->dragons[i-1].isVolant = database->dragons[i].isVolant;
-//     database->dragons[i-1].fierceness = database->dragons[i].fierceness;
-//     database->dragons[i-1].numColours = database->dragons[i].numColours;
-//     for (size_t j = 0; j < database->dragons[i].numColours; j++) {
-//         database->dragons[i-1].colours[j] = malloc(sizeof(NAME_SIZE));
-//         database->dragons[i-1].colours[j] = database->dragons[i].colours[j];
-//     }
-// }
-
 void listBriefDragons(Database* database) {
-    puts("--------------------------------------------------------------------------------");
-    puts("ID Name");
-    puts("--------------------------------------------------------------------------------");
+    printHeader(BRIEF);
 
     for (size_t i = 0; i < database->size; i++) {
         printDragon(database->dragons[i], BRIEF);
@@ -291,9 +240,7 @@ void listBriefDragons(Database* database) {
 }
 
 void listDetailedDragons(Database* database) {
-    puts("--------------------------------------------------------------------------------");
-    puts("ID Name \t Volant Fierceness #Colours Colors");
-    puts("--------------------------------------------------------------------------------");
+    printHeader(DETAILED);
 
     for (size_t i = 0; i < database->size; i++) {
         printDragon(database->dragons[i], DETAILED);
@@ -303,84 +250,60 @@ void listDetailedDragons(Database* database) {
 void showDragonDetail(Database* database) {
     bool foundDragon = false;
     char dragon[NAME_SIZE];
-    char *endPtr;
+    int numDragons = 0;
 
     printf("Please enter id or name of dragon: ");
+    fflush(stdin);
     scanf("%s", dragon);
 
-    puts("--------------------------------------------------------------------------------");
-    puts("ID Name \t Volant Fierceness #Colours Colors");
-    puts("--------------------------------------------------------------------------------");
+    printHeader(DETAILED);
 
-    
-    
+    int dragonIdx = getDragonIndex(dragon, database, &foundDragon);
+    // printDragon(database->dragons[dragonIdx], DETAILED);
+    if (dragonIdx != 1) {
+        printDragons(dragon, database, dragonIdx, &numDragons, DETAILED);
+    }
+   
+    if (!foundDragon) printf("Could not find a dragon match.");
+}
+
+static int getDragonIndex(char dragon[NAME_SIZE], Database *database, bool *foundDragon) {
+    char *endPtr;
+
     if (isdigit(dragon[0])) {
         int dragonID = strtol(dragon, &endPtr, 10);
         for (size_t i = 0; i < database->size; i++) {
             if (dragonID == database->dragons[i].id) {
-                printDragon(database->dragons[i], DETAILED);
-                return;
+                *foundDragon = true;
+                return i;
             }
         }
     }
     else if (isalpha(dragon[0])) {
         for (size_t i = 0; i < database->size; i++) {
-            for (size_t j = 0; dragon[j] != '\0'; j++) {
-                dragon[j] = toupper(dragon[j]);
-            }
+            stringToUpr(dragon);
             if (strcmp(dragon, database->dragons[i].name) == 0) {
-                printDragon(database->dragons[i], DETAILED);
-                foundDragon = true;
+                *foundDragon = true;
+                return i;
             }
         }
     }
-    else printf("Invalid input.");
-
-    if (!foundDragon) printf("Could not find a dragon match.");
-
-    // Dragon dragons[database->size];
-    // size_t i = 0;
-    // for (; i < database->size;) {
-    //     dragons[i] = findDragon(dragon, database, &i);
-    // }
-
-    // for (size_t i = 0; i < database->size; i++) {
-    //     printDragon(findDragon(dragon, database, &i), DETAILED);
-    // }
-
-    // while (sizeof(dragons)/sizeof(dragons[0]) > 0) {
-    //     printDragon(database->dragons[i], DETAILED);
-    // }
+    return -1;
 }
 
-// (updateDragon)
-// static void findDragon(char dragon[NAME_SIZE], Database *database, Dragon *dragonArray) {
-//     char *endPtr;
-//     if (isdigit(dragon[0])) {
-//         int dragonID = strtol(dragon, &endPtr, 10);
-//         for (size_t i = 0; i < database->size; i++) {
-//             if (dragonID == database->dragons[i].id) {
-//                 // printDragon(database->dragons[i], DETAILED);
-//                 *(dragonArray+i) = database->dragons[i];
-//                 // dragonArray[i] = database->dragons[i];
-//                 return;
-//             }
-//         }
-//     }
-//     else if (isalpha(dragon[0])) {
-//         for (size_t i = 0; i < database->size; i++) {
-//             for (size_t j = 0; dragon[j] != '\0'; j++) {
-//                 dragon[j] = toupper(dragon[j]);
-//             }
-//             if (strcmp(dragon, database->dragons[i].name) == 0) {
-//                 // printDragon(database->dragons[i], DETAILED);
-//                 // foundDragon = true;
-//                 *(dragonArray+i) = database->dragons[i];
-//                 // return database->dragons[i];
-//             }
-//         }
-//     }
-// }
+void printDragons(char dragon[NAME_SIZE], Database *database, int dragonIdx, int *numDragons, enum ListType listType) {
+    char *endPtr;
+    for (size_t i = dragonIdx; i < database->size; i++) {
+        if (strcmp(dragon, database->dragons[i].name) == 0) {
+            printDragon(database->dragons[i], listType);
+            *numDragons+=1;
+        }
+        else if (strtol(dragon, &endPtr, 10) == database->dragons[i].id) {
+            printDragon(database->dragons[i], listType);
+            return;
+        } 
+    }
+}
 
 static void printDragon(Dragon dragon, enum ListType listType) {
     if (listType == DETAILED) {
@@ -403,4 +326,17 @@ static void printDragon(Dragon dragon, enum ListType listType) {
         dragon.name);
     }
     printf("\n");
+}
+
+static void printHeader(enum ListType listType) {
+    if (listType == DETAILED) {
+        puts("--------------------------------------------------------------------------------");
+        puts("ID Name \t Volant Fierceness #Colours Colours");
+        puts("--------------------------------------------------------------------------------");
+    }
+    else {
+        puts("--------------------------------------------------------------------------------");
+        puts("ID Name");
+        puts("--------------------------------------------------------------------------------");
+    }    
 }
