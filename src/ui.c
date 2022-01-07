@@ -10,6 +10,7 @@ void executeCommands(Database *database) {
 
     while (inputValue != -1) {
         printf("\n?: ");
+        fflush(stdin);
         scanf("%d", &inputValue);
 
         switch (inputValue) {
@@ -23,8 +24,8 @@ void executeCommands(Database *database) {
             case 6: showDragonDetail(database); break;
             case 7: listDBStatistics(database); break;
             case 8: break;
-            case -1: printf("Have a good one! See ya!"); break;
-            default: puts("Invalid selection. Please try again.!\n"); break;   
+            case -1: puts("Have a good one! See ya!"); break;
+            default: puts("Invalid selection. Please try again.!"); break;   
         }
     }
 } // End of the function executeCommands

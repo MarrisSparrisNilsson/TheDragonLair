@@ -87,12 +87,12 @@ void saveDatabase(char *filename, Database* database) {
 void destroyDatabase(Database* database) {
     if(database != NULL) {
         if (database->dragons != NULL) {
-            for (size_t i = 0; i < database->size; i++) {
-                free(database->dragons[i].name);
-                for (size_t j = 0; j < database->dragons[i].numColours; j++) {
-                    free(database->dragons[i].colours[j]);
-                }
-            }
+            // for (size_t i = 0; i < database->size; i++) {
+            //     free(database->dragons[i].name);
+            //     for (size_t j = 0; j < database->dragons[i].numColours; j++) {
+            //         free(database->dragons[i].colours[j]);
+            //     }
+            // }
             free(database->dragons);
         }
         free(database);
@@ -127,7 +127,35 @@ void listDBStatistics(Database* database) {
 
 // }
 
+// // Start of function bubbleSort.
+// void bubbleSort(intArray a) { // Sorts an intArray in descending or ascending order.
+//     for (unsigned int pass = 0; a[pass + 1] != SENTINEL; ++pass) {
+
+//         // loop to control comparisons during each pass
+//         for (size_t j = 0; a[j + 1] != SENTINEL; ++j) {
+
+//             if (sortOrder == ASCENDING) {
+//                 if (a[j] > a[j + 1]) {
+//                     swap(&a[j], &a[j + 1]);
+//                 }
+//             }
+//             if (sortOrder == DESCENDING) {
+//                 if (a[j] < a[j + 1]) {
+//                     swap(&a[j], &a[j + 1]);
+//                 }
+//             }
+//         }   
+//     }
+// } // End of function swap. 
+
+// // Start of function swap.
+// void swap(int *element1Ptr, int *element2Ptr) { // Swaps elements in an intArray.
+//     int hold = *element1Ptr;
+//     *element1Ptr = *element2Ptr;
+//     *element2Ptr = hold;
+// } // End of function swap.
+
 void getDatabaseFilename(char filename[MAX_FILENAME]) {
     printf("Please enter filename: ");
-    scanf("%s", filename);
+    scanf("%20s", filename);
 }   
