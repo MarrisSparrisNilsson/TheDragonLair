@@ -290,6 +290,39 @@ static void swapDragon(Database *database, size_t i) {
         database->dragons[i-1].colours[j] = database->dragons[i].colours[j];
     }
 }
+static int findBinaryInterative(int key, int array[], int left, int right) {
+    while (left <= right) {
+        int mid = (left + right) / 2;
+        // If key is present at mid (split point)
+        if (key == array[mid])
+        return mid;
+        // If key > mid-entry, skip left subarray
+        if (key > array[mid])
+        left = mid + 1;
+        // If key < mid-entry, skip right subarray
+        else
+        right = mid - 1;
+    }
+    return -1; // Key not in array
+}
+
+static void stringToUpr(char *string) {
+    for (size_t i = 0; string[i] != '\0'; i++) {
+        string[i] = toupper(string[i]);
+    }
+}
+
+static void swapDragon(Database *database, size_t i) {
+    database->dragons[i-1].name = database->dragons[i].name;
+    database->dragons[i-1].id = database->dragons[i].id;
+    database->dragons[i-1].isVolant = database->dragons[i].isVolant;
+    database->dragons[i-1].fierceness = database->dragons[i].fierceness;
+    database->dragons[i-1].numColours = database->dragons[i].numColours;
+    for (size_t j = 0; j < database->dragons[i].numColours; j++) {
+        database->dragons[i-1].colours[j] = malloc(sizeof(NAME_SIZE));
+        database->dragons[i-1].colours[j] = database->dragons[i].colours[j];
+    }
+} 
 
 void listBriefDragons(Database* database) {
     puts("--------------------------------------------------------------------------------");

@@ -17,7 +17,7 @@ void executeCommands(Database *database) {
             case 0: displayMainMenu(); break;
             case 1: insertDragon(database); break;
             case 2: break;
-            case 3: break;
+            case 3: deleteDragon(database); break;
             case 4: listBriefDragons(database); break;
             case 5: listDetailedDragons(database); break;
             case 6: showDragonDetail(database); break;

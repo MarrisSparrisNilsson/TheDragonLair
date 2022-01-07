@@ -37,7 +37,6 @@ void deleteDragon(Database *database);
 static void stringToUpr(char *string);
 static int findBinaryInterative(int key, int array[], int left, int right);
 static void swapDragon(Database *database, size_t i);
-
 void listBriefDragons(Database* database);
 void listDetailedDragons(Database* database);
 void showDragonDetail(Database* database);
