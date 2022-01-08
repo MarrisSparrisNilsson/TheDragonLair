@@ -17,13 +17,13 @@ void executeCommands(Database *database) {
             
             case 0: displayMainMenu(); break;
             case 1: insertDragon(database); break;
-            case 2: break;
+            case 2: updateDragon(database); break;
             case 3: deleteDragon(database); break;
             case 4: listBriefDragons(database); break;
             case 5: listDetailedDragons(database); break;
             case 6: showDragonDetail(database); break;
             case 7: listDBStatistics(database); break;
-            case 8: break;
+            case 8: sortDatabase(database); break;
             case -1: puts("Have a good one! See ya!"); break;
             default: puts("Invalid selection. Please try again.!"); break;   
         }

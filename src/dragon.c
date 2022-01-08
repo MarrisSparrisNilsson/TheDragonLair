@@ -4,12 +4,11 @@
 #include <ctype.h>
 #include <string.h>
 #include "dragon.h"
+#include "database.h"
 
 void insertDragon(Database *database) {
     
-    if (database->size+1 > database->capacity) {
-        // expand
-    }
+    if (database->size == database->capacity) expandDatabase(database);
     int dragonIndex = database->size;
     
     setDragonName(database, dragonIndex);
@@ -151,19 +150,58 @@ void updateDragon(Database* database) {
     // or name (remember, an id is an integer, and a valid name only contains letters from the English
     // alphabet).
 
-    // char dragon[NAME_SIZE];
-
-    // printf("Please enter id or name of dragon: ");
-    // scanf("%s", dragon);
-
-    // // database->size
-    // Dragon dragons[database->size];
-    // findDragon(dragon, database, dragons);
-
-    // if (sizeof(dragons)/sizeof(dragons[0]) > 2) {
-    //     /* code */
-    // }
     
+    bool foundDragon = false;
+    char dragon[NAME_SIZE];
+    int dragonIdx = -1;
+
+    while (!foundDragon) {
+        printf("Please enter a id or a name of the dragon you want to update: ");
+        fflush(stdin);
+        scanf("%s", dragon);
+
+
+        if (isdigit(dragon[0])) {
+            dragonIdx = getDragonIndex(dragon, database, &foundDragon);
+            setIsVolant(database, dragonIdx);
+            setFierceness(database, dragonIdx);
+            setDragonColor(database, dragonIdx);
+            printf("The dragon with id %d has been updated!\n", database->dragons[dragonIdx].id);
+        }
+        else {
+            stringToUpr(dragon);
+            printHeader(BRIEF);
+            int numDragons = 0;
+
+            dragonIdx = getDragonIndex(dragon, database, &foundDragon);
+            printDragons(dragon, database, dragonIdx, &numDragons, BRIEF);
+
+            if (numDragons > 1) {
+                dragonIdx = -1;
+                while (dragonIdx == -1) {
+                    printf("Please choose which id matching the dragon you want to update: ");
+                    fflush(stdin);
+                    scanf("%s", &dragon);
+
+                    dragonIdx = getDragonIndex(dragon, database, &foundDragon);
+                    if (dragonIdx != -1) {
+                        setIsVolant(database, dragonIdx);
+                        setFierceness(database, dragonIdx);
+                        setDragonColor(database, dragonIdx);
+                        printf("The dragon with id: %d has been updated!\n", database->dragons[dragonIdx].id);
+                    }
+                    else puts("Couldn't find dragon match, please try again!");
+                }
+            }
+            else if (foundDragon) {
+                setIsVolant(database, dragonIdx);
+                setFierceness(database, dragonIdx);
+                setDragonColor(database, dragonIdx);
+                printf("The dragon with name %s has been updated!\n", dragon);
+            }
+        }
+        if (!foundDragon) puts("Could not find a matching dragon, please try again!\n");
+    }
 }
 
 void deleteDragon(Database *database) {
@@ -223,7 +261,7 @@ static void stringToUpr(char *string) {
 }
 
 // Start of function swap.
-static void swapDragon(Database *database, int startIdx) { // Swaps elements in an intArray.
+static void swapDragon(Database *database, int startIdx) { // Swaps dragons in database.
     for (size_t i = startIdx; i < database->size; i++) {
         Dragon tempDragon = database->dragons[i];
         database->dragons[i] = database->dragons[i+1];

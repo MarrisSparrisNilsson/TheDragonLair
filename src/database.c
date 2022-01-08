@@ -18,6 +18,11 @@ Database* createDatabase() {
     return dBPtr;
 } // End of function createDatabase.
 
+void getDatabaseFilename(char filename[MAX_FILENAME]) {
+    printf("Please enter filename: ");
+    scanf("%20s", filename);
+}
+
 void loadDatabase(char filename[MAX_FILENAME], Database* database) {
     FILE *fPtr = fopen(filename, "r");
 
@@ -28,9 +33,9 @@ void loadDatabase(char filename[MAX_FILENAME], Database* database) {
 
     fscanf(fPtr, "%u\n", &database->size);
 
-    // while (database->size > database->capacity) {
-    //     expandDB(database);
-    // }
+    while (database->size > database->capacity) {
+        expandDatabase(database);
+    }
 
     for (size_t i = 0; i < database->size; i++) {
         fscanf(fPtr, "%u\n", &database->dragons[i].id);
@@ -54,12 +59,22 @@ void loadDatabase(char filename[MAX_FILENAME], Database* database) {
 // the database is grown as described above. To do this, you can use the functions malloc or realloc
 // in stdlib.h.
 
-// static void expandDB(Database *database) {
-//     Dragon *dragonPtr = (Dragon*) calloc(GROWTH_FACTOR * database->capacity, sizeof(Dragon));
-//     if (dragonPtr == NULL) {
-//         printf("Could not expand database");
-//     };
-// }
+void expandDatabase(Database *database) {
+
+    // Create new database of size: current capacity * GROWTH_FACTOR
+    Dragon *dragonPtr = (Dragon*) calloc(GROWTH_FACTOR * database->capacity, sizeof(Dragon));
+    if (dragonPtr == NULL) printf("Could not expand database");
+
+    // Add dragons into the new database
+    for (int i = 0; i < database->size; i++) dragonPtr[i] = database->dragons[i];
+
+    // Free the old database from the heap memory
+    free(database->dragons);
+    // Set the new database to be part of the active database
+    // Increase current capacity
+    database->dragons = dragonPtr;
+    database->capacity = database->capacity * GROWTH_FACTOR;
+}
 
 void saveDatabase(char *filename, Database* database) {
     FILE *fPtr = fopen(filename, "w");
@@ -87,12 +102,12 @@ void saveDatabase(char *filename, Database* database) {
 void destroyDatabase(Database* database) {
     if(database != NULL) {
         if (database->dragons != NULL) {
-            // for (size_t i = 0; i < database->size; i++) {
-            //     free(database->dragons[i].name);
-            //     for (size_t j = 0; j < database->dragons[i].numColours; j++) {
-            //         free(database->dragons[i].colours[j]);
-            //     }
-            // }
+            for (size_t i = 0; i < database->size; i++) {
+                free(database->dragons[i].name);
+                for (size_t j = 0; j < database->dragons[i].numColours; j++) {
+                    free(database->dragons[i].colours[j]);
+                }
+            }
             free(database->dragons);
         }
         free(database);
@@ -123,39 +138,60 @@ void listDBStatistics(Database* database) {
     printf("%4d %13d %13d %7d %10d\n", database->size, min_fierceness, max_fierceness, volant, nonVolant);
 }
 
-// void sortDB(Database* database) {
+// Start of function sortDatabase.
+void sortDatabase(Database *database) {// Sorts a database in ascending order based on id or name.
 
-// }
+    int input = -1;
 
-// // Start of function bubbleSort.
-// void bubbleSort(intArray a) { // Sorts an intArray in descending or ascending order.
-//     for (unsigned int pass = 0; a[pass + 1] != SENTINEL; ++pass) {
+    while (input != 0 && input != 1) {
+        printf("Enter sort by id (0) or name (1): ");
+        fflush(stdin);
+        scanf("%d", &input);
+        if (input != 0 && input != 1) puts("Invalid input, please try again!");
+    }
+    for (unsigned int h = 0; h < database->size-1; ++h) { // loop to control comparisons during each pass
+        for (int j = 0, i = 0; j < database->size-1;) {
+            if (input == 0) {
+                if (database->dragons[j].id > database->dragons[j+1].id) {
+                    swapDragon(database, j);
+                }
+                j++;
+            }
+            else if(input == 1) sortDragonByName(database, &i, &j);        
+        }   
+    }
+    puts("Database sorted.");
+}
 
-//         // loop to control comparisons during each pass
-//         for (size_t j = 0; a[j + 1] != SENTINEL; ++j) {
+// Start of function swap.
+static void swapDragon(Database *database, int startidx) { // Swaps dragons in database.
+    Dragon tempDragon = database->dragons[startidx];
+    database->dragons[startidx] = database->dragons[startidx+1];
+    database->dragons[startidx+1] = tempDragon;
+} // End of function swap.
 
-//             if (sortOrder == ASCENDING) {
-//                 if (a[j] > a[j + 1]) {
-//                     swap(&a[j], &a[j + 1]);
-//                 }
-//             }
-//             if (sortOrder == DESCENDING) {
-//                 if (a[j] < a[j + 1]) {
-//                     swap(&a[j], &a[j + 1]);
-//                 }
-//             }
-//         }   
-//     }
-// } // End of function swap. 
+static void sortDragonByName(Database *database, int *i, int *j) {
 
-// // Start of function swap.
-// void swap(int *element1Ptr, int *element2Ptr) { // Swaps elements in an intArray.
-//     int hold = *element1Ptr;
-//     *element1Ptr = *element2Ptr;
-//     *element2Ptr = hold;
-// } // End of function swap.
+    int dragNameLen1 = strlen(database->dragons[*j].name);
+    int dragNameLen2 = strlen(database->dragons[*j+1].name);
+    int diff = dragNameLen1 - dragNameLen2;
+    int nameLen = (diff <= 0) ? dragNameLen1 : dragNameLen2;
 
-void getDatabaseFilename(char filename[MAX_FILENAME]) {
-    printf("Please enter filename: ");
-    scanf("%20s", filename);
-}   
+    if (*i < nameLen) {
+        if (database->dragons[*j].name[*i] > database->dragons[*j+1].name[*i]) {
+            if (nameLen == dragNameLen1) swapDragon(database, *j);
+            else swapDragon(database, *j+1);
+            nextDragon(i, j);
+        }
+        else {
+            if(database->dragons[*j].name[*i] == database->dragons[*j+1].name[*i]) {
+                *i+=1;
+                if (*i == nameLen) nextDragon(i, j);
+            }
+            else nextDragon(i, j);
+        }
+    }
+}
+static void nextDragon(int *i, int *j) {
+    *j+=1; *i = 0;
+}
