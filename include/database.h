@@ -10,13 +10,15 @@
 #define NAME_SIZE 10
 
 Database* createDatabase();
-void destroyDatabase(Database *database);
-void loadDatabase(char *filename, Database *database);
-static void expandDB(Database *database);
-void saveDatabase(char *filename, Database *database);
-void listDBStatistics(Database* database);
-void sortDB(Database* database);
-
 void getDatabaseFilename(char filename[MAX_FILENAME]);
+void loadDatabase(char *filename, Database *database);
+void expandDatabase(Database *database);
+void saveDatabase(char *filename, Database *database);
+void destroyDatabase(Database *database);
+void listDBStatistics(Database* database);
+void sortDatabase(Database *database);
+static void swapDragon(Database *database, int startidx);
+static void sortDragonByName(Database *database, int *i, int *j);
+static void nextDragon(int *i, int *j);
 
 #endif

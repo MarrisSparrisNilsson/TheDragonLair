@@ -15,7 +15,7 @@ static void setDragonColor(Database * database, unsigned int dragonIndex);
 static void formatColorStr(char *string, bool *isValidInput);
 
 
-// void updateDragon(Database* database);
+void updateDragon(Database* database);
 void deleteDragon(Database *database);
 static int getDragonIndex(char dragon[NAME_SIZE], Database *database, bool *foundDragon);
 void printDragons(char dragon[NAME_SIZE], Database *database, int dragonIdx, int *numDragons, enum ListType listType);
