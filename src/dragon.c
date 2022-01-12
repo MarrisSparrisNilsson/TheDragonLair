@@ -143,14 +143,7 @@ static void formatColorStr(char *string, bool *isValidInput) {
     }
 }
 
-void updateDragon(Database* database) {
-    // When the user chooses to update a dragon, the user should be asked to enter the id or name of
-    // a dragon. The user should not first be asked if an id or name should be entered. Instead the
-    // program should read in the entry as a search string, and interpret the search string as an id
-    // or name (remember, an id is an integer, and a valid name only contains letters from the English
-    // alphabet).
-
-    
+void updateDragon(Database* database) {    
     bool foundDragon = false;
     char dragon[NAME_SIZE];
     int dragonIdx = -1;
@@ -170,13 +163,12 @@ void updateDragon(Database* database) {
         }
         else {
             stringToUpr(dragon);
-            printHeader(BRIEF);
-            int numDragons = 0;
+            int dragonMatches = 0;
 
             dragonIdx = getDragonIndex(dragon, database, &foundDragon);
-            printDragons(dragon, database, dragonIdx, &numDragons, BRIEF);
+            // printDragonMatches(dragon, database, dragonIdx, &dragonMatches, BRIEF);
 
-            if (numDragons > 1) {
+            if (dragonMatches > 1) {
                 dragonIdx = -1;
                 while (dragonIdx == -1) {
                     printf("Please choose which id matching the dragon you want to update: ");
@@ -207,49 +199,27 @@ void updateDragon(Database* database) {
 void deleteDragon(Database *database) {
 
     bool foundDragon = false;
-    char dragon[NAME_SIZE];
+    char input[NAME_SIZE];
     int dragonIdx = -1;
 
     while (!foundDragon) {
         printf("Please enter a id or a name of the dragon you want to delete: ");
         fflush(stdin);
-        scanf("%s", dragon);
+        scanf("%s", input);
 
+        dragonIdx = findDragonIndex(input, database, &foundDragon);
 
-        if (isdigit(dragon[0])) {
-            dragonIdx = getDragonIndex(dragon, database, &foundDragon);
-            printf("The dragon with id %d has been deleted!\n", database->dragons[dragonIdx].id);
-            swapDragon(database, dragonIdx);
-        }
-        else {
-            stringToUpr(dragon);
-            printHeader(BRIEF);
-            int numDragons = 0;
+        if (foundDragon) {
+            isdigit(input[0])
+            ? printf("The dragon with id %d has been deleted!\n", database->dragons[dragonIdx].id)
+            : printf("The dragon with name %s has been deleted!\n", database->dragons[dragonIdx].name);
 
-            dragonIdx = getDragonIndex(dragon, database, &foundDragon);
-            printDragons(dragon, database, dragonIdx, &numDragons, BRIEF);
-
-            if (numDragons > 1) {
-                dragonIdx = -1;
-                while (dragonIdx == -1) {
-                    printf("Please choose which id matching the dragon you want to delete: ");
-                    fflush(stdin);
-                    scanf("%s", &dragon);
-
-                    dragonIdx = getDragonIndex(dragon, database, &foundDragon);
-                    if (dragonIdx != -1) {
-                        printf("The dragon with id: %d has been deleted!\n", database->dragons[dragonIdx].id);
-                        swapDragon(database, dragonIdx);
-                    }
-                    else puts("Couldn't find dragon match, please try again!");
-                }
+            for (size_t i = dragonIdx; i < database->size; i++) {
+                swapDragons(database, i);
             }
-            else {
-                swapDragon(database, dragonIdx);
-                if (foundDragon) printf("The dragon with name %s has been deleted!\n", dragon);
-            }
+
+            database->size--;
         }
-        if (foundDragon) database->size--;
         else puts("Could not find a matching dragon, please try again!\n");
     }
 }
@@ -260,13 +230,10 @@ static void stringToUpr(char *string) {
     }
 }
 
-// Start of function swap.
-static void swapDragon(Database *database, int startIdx) { // Swaps dragons in database.
-    for (size_t i = startIdx; i < database->size; i++) {
-        Dragon tempDragon = database->dragons[i];
-        database->dragons[i] = database->dragons[i+1];
-        database->dragons[i+1] = tempDragon;
-    }
+static void swapDragons(Database *database, int i) {
+    Dragon tempDragon = database->dragons[i];
+    database->dragons[i] = database->dragons[i+1];
+    database->dragons[i+1] = tempDragon;
 } // End of function swap.
 
 void listBriefDragons(Database* database) {
@@ -288,7 +255,7 @@ void listDetailedDragons(Database* database) {
 void showDragonDetail(Database* database) {
     bool foundDragon = false;
     char dragon[NAME_SIZE];
-    int numDragons = 0;
+    int dragonMatches = 0;
 
     printf("Please enter id or name of dragon: ");
     fflush(stdin);
@@ -296,20 +263,52 @@ void showDragonDetail(Database* database) {
 
     printHeader(DETAILED);
 
-    int dragonIdx = getDragonIndex(dragon, database, &foundDragon);
-    // printDragon(database->dragons[dragonIdx], DETAILED);
-    if (dragonIdx != 1) {
-        printDragons(dragon, database, dragonIdx, &numDragons, DETAILED);
+    int dragonIdx = findDragonIndex(dragon, database, &foundDragon);
+    if (dragonIdx != -1) {
+        printDragon(database->dragons[dragonIdx], DETAILED);
     }
    
     if (!foundDragon) printf("Could not find a dragon match.");
 }
 
-static int getDragonIndex(char dragon[NAME_SIZE], Database *database, bool *foundDragon) {
-    char *endPtr;
+static int findDragonIndex(char input[NAME_SIZE], Database *database, bool *foundDragon) {
+    int dragonIdx = -1;
 
-    if (isdigit(dragon[0])) {
-        int dragonID = strtol(dragon, &endPtr, 10);
+    if (isdigit(input[0])) return dragonIdx = getDragonIndex(input, database, foundDragon);
+    else {
+        stringToUpr(input);
+        unsigned int dragonMatches = 0;
+
+        dragonIdx = getDragonIndex(input, database, foundDragon);
+        printDragonMatches(input, database, dragonIdx, &dragonMatches, BRIEF);
+
+        if (dragonMatches > 1) {
+            int dragonID;
+            *foundDragon = false;
+            while (!*foundDragon) {
+                printf("Please enter the id matching the dragon you want to delete: ");
+                fflush(stdin);
+                scanf("%d", &dragonID);
+                
+                for (size_t i = 0; i < database->size; i++) {
+                    if (dragonID == database->dragons[i].id && strcmp(input, database->dragons[i].name) == 0) {
+                        *foundDragon = true;
+                        return i;
+                    }
+                }
+                if (!*foundDragon) puts("Invalid input! Please select one of the listed selections above.");
+            }
+        }
+        else return dragonIdx;
+    }
+}
+
+static int getDragonIndex(char input[NAME_SIZE], Database *database, bool *foundDragon) {
+    char *endPtr;
+    int dragonIdx = -1;
+
+    if (isdigit(input[0])) {
+        int dragonID = strtol(input, &endPtr, 10);
         for (size_t i = 0; i < database->size; i++) {
             if (dragonID == database->dragons[i].id) {
                 *foundDragon = true;
@@ -317,30 +316,43 @@ static int getDragonIndex(char dragon[NAME_SIZE], Database *database, bool *foun
             }
         }
     }
-    else if (isalpha(dragon[0])) {
+    else if (isalpha(input[0])) {
         for (size_t i = 0; i < database->size; i++) {
-            stringToUpr(dragon);
-            if (strcmp(dragon, database->dragons[i].name) == 0) {
+            stringToUpr(input);
+            if (strcmp(input, database->dragons[i].name) == 0) {
                 *foundDragon = true;
                 return i;
             }
         }
     }
-    return -1;
+    return dragonIdx;
 }
 
-void printDragons(char dragon[NAME_SIZE], Database *database, int dragonIdx, int *numDragons, enum ListType listType) {
+void printDragonMatches(char input[NAME_SIZE], Database *database, int dragonIdx, int *dragonMatches, enum ListType listType) {
     char *endPtr;
     for (size_t i = dragonIdx; i < database->size; i++) {
-        if (strcmp(dragon, database->dragons[i].name) == 0) {
-            printDragon(database->dragons[i], listType);
-            *numDragons+=1;
-        }
-        else if (strtol(dragon, &endPtr, 10) == database->dragons[i].id) {
+        if (strtol(input, &endPtr, 10) == database->dragons[i].id) {
             printDragon(database->dragons[i], listType);
             return;
         } 
+        else if (strcmp(input, database->dragons[i].name) == 0) {
+            printDragon(database->dragons[i], listType);
+            *dragonMatches+=1;
+        }
     }
+}
+
+static void printHeader(enum ListType listType) {
+    if (listType == DETAILED) {
+        puts("--------------------------------------------------------------------------------");
+        puts("ID Name \t Volant Fierceness #Colours Colours");
+        puts("--------------------------------------------------------------------------------");
+    }
+    else {
+        puts("--------------------------------------------------------------------------------");
+        puts("ID Name");
+        puts("--------------------------------------------------------------------------------");
+    }    
 }
 
 static void printDragon(Dragon dragon, enum ListType listType) {
@@ -364,17 +376,4 @@ static void printDragon(Dragon dragon, enum ListType listType) {
         dragon.name);
     }
     printf("\n");
-}
-
-static void printHeader(enum ListType listType) {
-    if (listType == DETAILED) {
-        puts("--------------------------------------------------------------------------------");
-        puts("ID Name \t Volant Fierceness #Colours Colours");
-        puts("--------------------------------------------------------------------------------");
-    }
-    else {
-        puts("--------------------------------------------------------------------------------");
-        puts("ID Name");
-        puts("--------------------------------------------------------------------------------");
-    }    
 }

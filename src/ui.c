@@ -14,7 +14,6 @@ void executeCommands(Database *database) {
         scanf("%d", &inputValue);
 
         switch (inputValue) {
-            
             case 0: displayMainMenu(); break;
             case 1: insertDragon(database); break;
             case 2: updateDragon(database); break;
@@ -32,7 +31,7 @@ void executeCommands(Database *database) {
 
 void printWelcomeMessage() {
     puts(
-        "=========================================================================="
+        "\n=========================================================================="
         "\n  This program helps organize information about dragons. You may add and"
         "\n  remove dragons and their attributes, list the dragons currently in the"
         "\n  database, and their attributes, look up the attributes of an individual"

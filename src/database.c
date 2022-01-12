@@ -68,9 +68,9 @@ void expandDatabase(Database *database) {
     // Add dragons into the new database
     for (int i = 0; i < database->size; i++) dragonPtr[i] = database->dragons[i];
 
-    // Free the old database from the heap memory
+    // Free the old array of dragons from the heap memory
     free(database->dragons);
-    // Set the new database to be part of the active database
+    // Set the new array of dragons to be part of the active database
     // Increase current capacity
     database->dragons = dragonPtr;
     database->capacity = database->capacity * GROWTH_FACTOR;
@@ -101,19 +101,10 @@ void saveDatabase(char *filename, Database* database) {
 
 void destroyDatabase(Database* database) {
     if(database != NULL) {
-        if (database->dragons != NULL) {
-            for (size_t i = 0; i < database->size; i++) {
-                free(database->dragons[i].name);
-                for (size_t j = 0; j < database->dragons[i].numColours; j++) {
-                    free(database->dragons[i].colours[j]);
-                }
-            }
-            free(database->dragons);
-        }
-        free(database);
+        free(database); // Frees memory from the memory allocated database strut.
+        database = NULL; // Sets the pointer to the database to NULL.
     }
-    database = NULL; // Sets the database to NULL.
-} // End of function destroyDatabase.
+}
 
 void listDBStatistics(Database* database) {
     puts("---------------------------------------------------");
@@ -125,12 +116,11 @@ void listDBStatistics(Database* database) {
     int volant = 0;
     int nonVolant = 0;
     for (size_t i = 0; i < database->size; i++) {
-        if (max_fierceness < database->dragons[i].fierceness) {
+        if (max_fierceness < database->dragons[i].fierceness)
             max_fierceness = database->dragons[i].fierceness;
-        }
-        if (min_fierceness > database->dragons[i].fierceness) {
+
+        if (min_fierceness > database->dragons[i].fierceness)
             min_fierceness = database->dragons[i].fierceness;
-        }
         if (database->dragons[i].isVolant == 'Y') volant++;
         if (database->dragons[i].isVolant == 'N') nonVolant++;
     }
@@ -139,8 +129,7 @@ void listDBStatistics(Database* database) {
 }
 
 // Start of function sortDatabase.
-void sortDatabase(Database *database) {// Sorts a database in ascending order based on id or name.
-
+void sortDatabase(Database *database) { // Sorts a database in ascending order based on id or name.
     int input = -1;
 
     while (input != 0 && input != 1) {
@@ -149,15 +138,11 @@ void sortDatabase(Database *database) {// Sorts a database in ascending order ba
         scanf("%d", &input);
         if (input != 0 && input != 1) puts("Invalid input, please try again!");
     }
+
     for (unsigned int h = 0; h < database->size-1; ++h) { // loop to control comparisons during each pass
         for (int j = 0, i = 0; j < database->size-1;) {
-            if (input == 0) {
-                if (database->dragons[j].id > database->dragons[j+1].id) {
-                    swapDragon(database, j);
-                }
-                j++;
-            }
-            else if(input == 1) sortDragonByName(database, &i, &j);        
+            if (input == 0) sortDragonsByID(database, &j);
+            else if (input == 1) sortDragonsByName(database, &i, &j);        
         }   
     }
     puts("Database sorted.");
@@ -170,28 +155,34 @@ static void swapDragon(Database *database, int startidx) { // Swaps dragons in d
     database->dragons[startidx+1] = tempDragon;
 } // End of function swap.
 
-static void sortDragonByName(Database *database, int *i, int *j) {
+static void sortDragonsByID(Database *database, int *j) {
+    if (database->dragons[*j].id > database->dragons[*j+1].id) {
+        swapDragon(database, *j);
+    }
+    *j+=1;
+}
 
+static void sortDragonsByName(Database *database, int *i, int *j) {
     int dragNameLen1 = strlen(database->dragons[*j].name);
     int dragNameLen2 = strlen(database->dragons[*j+1].name);
-    int diff = dragNameLen1 - dragNameLen2;
-    int nameLen = (diff <= 0) ? dragNameLen1 : dragNameLen2;
+    int diff = dragNameLen1 - dragNameLen2; // Calculates the length difference between the two strings.
+    int nameLen = (diff <= 0) ? dragNameLen1 : dragNameLen2; // Sets the name length to the shortest name string.
 
-    if (*i < nameLen) {
+    // If all characters in the name strings were equal, move on to the next dragon
+    if (*i == nameLen) nextDragon(i, j);
+    else {
+        // Checks if the characters on position i in both s
         if (database->dragons[*j].name[*i] > database->dragons[*j+1].name[*i]) {
             if (nameLen == dragNameLen1) swapDragon(database, *j);
             else swapDragon(database, *j+1);
             nextDragon(i, j);
         }
-        else {
-            if(database->dragons[*j].name[*i] == database->dragons[*j+1].name[*i]) {
-                *i+=1;
-                if (*i == nameLen) nextDragon(i, j);
-            }
-            else nextDragon(i, j);
-        }
+        // If characters are equal continue comparing the next set of characters
+        else if (database->dragons[*j].name[*i] == database->dragons[*j+1].name[*i]) *i+=1;
+        else nextDragon(i, j);
     }
 }
+
 static void nextDragon(int *i, int *j) {
     *j+=1; *i = 0;
 }
