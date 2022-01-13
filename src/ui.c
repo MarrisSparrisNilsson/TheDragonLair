@@ -62,8 +62,8 @@ void listDBStatistics(Database* database) {
     puts("Size MinFierceness MaxFierceness #Volant #NonVolant");
     puts("---------------------------------------------------");
 
-    int max_fierceness = 0;
-    int min_fierceness = 10;
+    unsigned int max_fierceness = 0;
+    unsigned int min_fierceness = database->size == 0 ? 0 : database->dragons[0].fierceness;
     int volant = 0;
     int nonVolant = 0;
     for (size_t i = 0; i < database->size; i++) {

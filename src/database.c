@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "database.h"
 
 // Start of function createDatabase.
@@ -19,7 +20,14 @@ Database* createDatabase() {
 
 void getDatabaseFilename(char filename[MAX_FILENAME]) {
     printf("Please enter filename: ");
-    scanf("%20s", filename);
+    scanf("%s", filename);
+
+    char str2[] = "Database/";
+    char tempStr[MAX_FILENAME];
+    strcpy(tempStr, "Database/");
+    strcat(tempStr, filename);
+    strcpy(filename, tempStr);
+
 }
 
 void loadDatabase(char filename[MAX_FILENAME], Database* database) {
@@ -29,26 +37,28 @@ void loadDatabase(char filename[MAX_FILENAME], Database* database) {
         puts("Could not find database file, creating new database file!");
         createDatabaseFile(filename, database);
     }
-    fscanf(fPtr, "%u\n", &database->size);
+    else {
+        fscanf(fPtr, "%u\n", &database->size);
 
-    while (database->size > database->capacity) {
-        expandDatabase(database);
-    }
-    for (size_t i = 0; i < database->size; i++) {
-        fscanf(fPtr, "%u\n", &database->dragons[i].id);
-
-        database->dragons[i].name = malloc(sizeof(char [NAME_SIZE]));
-        fscanf(fPtr, "%s\n", database->dragons[i].name);
-        fscanf(fPtr, "%c\n", &database->dragons[i].isVolant);
-        fscanf(fPtr, "%u\n", &database->dragons[i].fierceness);
-        fscanf(fPtr, "%u\n", &database->dragons[i].numColours);
-        for (size_t j = 0; j < database->dragons[i].numColours; j++) {
-            database->dragons[i].colours[j] = malloc(sizeof(NAME_SIZE));
-            fscanf(fPtr, "%s\n", database->dragons[i].colours[j]);
+        while (database->size > database->capacity) {
+            expandDatabase(database);
         }
+        for (size_t i = 0; i < database->size; i++) {
+            fscanf(fPtr, "%u\n", &database->dragons[i].id);
+
+            database->dragons[i].name = malloc(sizeof(char [NAME_SIZE]));
+            fscanf(fPtr, "%s\n", database->dragons[i].name);
+            fscanf(fPtr, "%c\n", &database->dragons[i].isVolant);
+            fscanf(fPtr, "%u\n", &database->dragons[i].fierceness);
+            fscanf(fPtr, "%u\n", &database->dragons[i].numColours);
+            for (size_t j = 0; j < database->dragons[i].numColours; j++) {
+                database->dragons[i].colours[j] = malloc(sizeof(NAME_SIZE));
+                fscanf(fPtr, "%s\n", database->dragons[i].colours[j]);
+            }
+        }
+        fscanf(fPtr, "%u\n", &database->nextId);
+        fclose(fPtr);
     }
-    fscanf(fPtr, "%u\n", &database->nextId);
-    fclose(fPtr);
 }
 
 void createDatabaseFile(char filename[MAX_FILENAME], Database* database) {
