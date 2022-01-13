@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include "database.h"
 
 // Start of function createDatabase.
@@ -27,16 +26,14 @@ void loadDatabase(char filename[MAX_FILENAME], Database* database) {
     FILE *fPtr = fopen(filename, "r");
 
     if (fPtr == NULL) {
-        printf("Could not find database");
-        exit(-1);
+        puts("Could not find database file, creating new database file!");
+        createDatabaseFile(filename, database);
     }
-
     fscanf(fPtr, "%u\n", &database->size);
 
     while (database->size > database->capacity) {
         expandDatabase(database);
     }
-
     for (size_t i = 0; i < database->size; i++) {
         fscanf(fPtr, "%u\n", &database->dragons[i].id);
 
@@ -51,6 +48,18 @@ void loadDatabase(char filename[MAX_FILENAME], Database* database) {
         }
     }
     fscanf(fPtr, "%u\n", &database->nextId);
+    fclose(fPtr);
+}
+
+void createDatabaseFile(char filename[MAX_FILENAME], Database* database) {
+    FILE *fPtr = fopen(filename, "w");
+
+    if (fPtr == NULL) {
+        printf("Could not create database file");
+        exit(-1);
+    }
+    fprintf(fPtr, "%u\n", database->size);
+    fprintf(fPtr, "%u\n", database->nextId);
     fclose(fPtr);
 }
 
@@ -104,85 +113,4 @@ void destroyDatabase(Database* database) {
         free(database); // Frees memory from the memory allocated database strut.
         database = NULL; // Sets the pointer to the database to NULL.
     }
-}
-
-void listDBStatistics(Database* database) {
-    puts("---------------------------------------------------");
-    puts("Size MinFierceness MaxFierceness #Volant #NonVolant");
-    puts("---------------------------------------------------");
-
-    int max_fierceness = 0;
-    int min_fierceness = 10;
-    int volant = 0;
-    int nonVolant = 0;
-    for (size_t i = 0; i < database->size; i++) {
-        if (max_fierceness < database->dragons[i].fierceness)
-            max_fierceness = database->dragons[i].fierceness;
-
-        if (min_fierceness > database->dragons[i].fierceness)
-            min_fierceness = database->dragons[i].fierceness;
-        if (database->dragons[i].isVolant == 'Y') volant++;
-        if (database->dragons[i].isVolant == 'N') nonVolant++;
-    }
-
-    printf("%4d %13d %13d %7d %10d\n", database->size, min_fierceness, max_fierceness, volant, nonVolant);
-}
-
-// Start of function sortDatabase.
-void sortDatabase(Database *database) { // Sorts a database in ascending order based on id or name.
-    int input = -1;
-
-    while (input != 0 && input != 1) {
-        printf("Enter sort by id (0) or name (1): ");
-        fflush(stdin);
-        scanf("%d", &input);
-        if (input != 0 && input != 1) puts("Invalid input, please try again!");
-    }
-
-    for (unsigned int h = 0; h < database->size-1; ++h) { // loop to control comparisons during each pass
-        for (int j = 0, i = 0; j < database->size-1;) {
-            if (input == 0) sortDragonsByID(database, &j);
-            else if (input == 1) sortDragonsByName(database, &i, &j);        
-        }   
-    }
-    puts("Database sorted.");
-}
-
-// Start of function swap.
-static void swapDragon(Database *database, int startidx) { // Swaps dragons in database.
-    Dragon tempDragon = database->dragons[startidx];
-    database->dragons[startidx] = database->dragons[startidx+1];
-    database->dragons[startidx+1] = tempDragon;
-} // End of function swap.
-
-static void sortDragonsByID(Database *database, int *j) {
-    if (database->dragons[*j].id > database->dragons[*j+1].id) {
-        swapDragon(database, *j);
-    }
-    *j+=1;
-}
-
-static void sortDragonsByName(Database *database, int *i, int *j) {
-    int dragNameLen1 = strlen(database->dragons[*j].name);
-    int dragNameLen2 = strlen(database->dragons[*j+1].name);
-    int diff = dragNameLen1 - dragNameLen2; // Calculates the length difference between the two strings.
-    int nameLen = (diff <= 0) ? dragNameLen1 : dragNameLen2; // Sets the name length to the shortest name string.
-
-    // If all characters in the name strings were equal, move on to the next dragon
-    if (*i == nameLen) nextDragon(i, j);
-    else {
-        // Checks if the characters on position i in both s
-        if (database->dragons[*j].name[*i] > database->dragons[*j+1].name[*i]) {
-            if (nameLen == dragNameLen1) swapDragon(database, *j);
-            else swapDragon(database, *j+1);
-            nextDragon(i, j);
-        }
-        // If characters are equal continue comparing the next set of characters
-        else if (database->dragons[*j].name[*i] == database->dragons[*j+1].name[*i]) *i+=1;
-        else nextDragon(i, j);
-    }
-}
-
-static void nextDragon(int *i, int *j) {
-    *j+=1; *i = 0;
 }

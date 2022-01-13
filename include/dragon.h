@@ -17,16 +17,15 @@ static void formatColorStr(char *string, bool *isValidInput);
 
 void updateDragon(Database* database);
 void deleteDragon(Database *database);
-static int getDragonIndex(char dragon[NAME_SIZE], Database *database, bool *foundDragon);
+static int getDragonIndex(char dragon[NAME_SIZE], Database *database);
 void printDragonMatches(char dragon[NAME_SIZE], Database *database, int dragonIdx, int *numDragons, enum ListType listType);
 static void stringToUpr(char *string);
 static void swapDragons(Database *database, int startIdx);
 void listBriefDragons(Database* database);
 void listDetailedDragons(Database* database);
 void showDragonDetail(Database* database);
-static int findDragonIndex(char dragon[NAME_SIZE], Database *database, bool *foundDragon);
+static int findDragonIndex(char dragon[NAME_SIZE], Database *database);
 static void printHeader(enum ListType listType);
 static void printDragon(Dragon dragon, enum ListType listType);
-
 
 #endif
