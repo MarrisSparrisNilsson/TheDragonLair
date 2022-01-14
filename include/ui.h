@@ -3,15 +3,15 @@
 
 #include "dBstructs.h"
 
+// Handles the execution of the program depending on the input from the user.
 void executeCommands(Database *database);
+// Prints a welcome message.
 void printWelcomeMessage();
+// Displays the main menu.
 void displayMainMenu();
-
+// Displays statistics about the database.
 void listDBStatistics(Database* database);
+// Sorts the database either by id or name in acending order.
 void sortDatabase(Database *database);
-static void swapDragons(Database *database, int startidx);
-static void sortDragonsByID(Database *database, int *j);
-static void sortDragonsByName(Database *database, int *i, int *j);
-static void nextDragon(int *i, int *j);
 
 #endif

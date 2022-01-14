@@ -1,31 +1,22 @@
 #ifndef _dragon_h
 #define _dragon_h
 
-#include <stdbool.h>
 #include "dBstructs.h"
-
 #define NAME_SIZE 10
+// This enumeration represents different print methods.
 enum ListType { DETAILED, BRIEF };
 
+// This function inserts a dragon to the database and returns void.
 void insertDragon(Database *database);
-static void setDragonName(Database *database, unsigned int dragonIndex);
-static char setIsVolant(Database *database, unsigned int dragonIndex);
-static int setFierceness(Database *database, unsigned int dragonIndex);
-static void setDragonColor(Database * database, unsigned int dragonIndex);
-static void formatColorStr(char *string, bool *isValidInput);
-
-
+// This function updates an existing dragon in the database and returns void.
 void updateDragon(Database* database);
+// This function deletes an existing dragon in the database and returns void.
 void deleteDragon(Database *database);
-static int getDragonIndex(char dragon[NAME_SIZE], Database *database);
-void printDragonMatches(char dragon[NAME_SIZE], Database *database, int dragonIdx, int *numDragons, enum ListType listType);
-static void stringToUpr(char *string);
-static void swapDragons(Database *database, int startIdx);
+// This function shows a BRIEF list of the dragons existing in the database and returns void.
 void listBriefDragons(Database* database);
+// This function shows a DETAILED list of the dragons existing in the database and returns void.
 void listDetailedDragons(Database* database);
+// This function shows all details for a specific dragon existing in the database and returns void.
 void showDragonDetail(Database* database);
-static int findDragonIndex(char dragon[NAME_SIZE], Database *database);
-static void printHeader(enum ListType listType);
-static void printDragon(Dragon dragon, enum ListType listType);
 
 #endif

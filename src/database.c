@@ -1,59 +1,77 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "database.h"
 
-// Start of function createDatabase.
+// Creates a file given by the provided file name.
+static void createDatabaseFile(char filename[MAX_FILENAME], Database* database);
+
+// Creates a pointer to the allocated database
 Database* createDatabase() {
-    Database *dBPtr = (Database*) malloc(sizeof(Database)); // Allocates memory on the heap for a Database.
+    Database *dBPtr = (Database*) malloc(sizeof(Database)); // Allocates memory on the heap for the Database.
     if (dBPtr == NULL) return NULL;
 
-    dBPtr->dragons = (Dragon*) calloc(INITIAL_CAPACITY, sizeof(Dragon)); // Allocates memory on the heap for a Database.
+    dBPtr->dragons = (Dragon*) calloc(INITIAL_CAPACITY, sizeof(Dragon)); // Allocates memory on the heap for the dragons array.
     if (dBPtr->dragons == NULL) return NULL;
 
-    dBPtr->capacity = INITIAL_CAPACITY;
-    dBPtr->size = 0;
-    dBPtr->nextId = 1;
+    dBPtr->capacity = INITIAL_CAPACITY; // Sets the initial capacity of the database
+    dBPtr->size = 0; // Start size is set to 0
+    dBPtr->nextId = 1; // The id for the next dragon to be inserted is set to 1
 
     return dBPtr;
-} // End of function createDatabase.
-
-void getDatabaseFilename(char filename[MAX_FILENAME]) {
-    printf("Please enter filename: ");
-    scanf("%20s", filename);
 }
 
+// Promts the user for a filename and concatinates the directory name in front of the file name.
+void getDatabaseFilename(char filename[MAX_FILENAME]) {
+    printf("Please enter filename: ");
+    scanf("%s", filename);
+
+    char tempStr[MAX_FILENAME];
+    strcpy(tempStr, "Database/");
+    strcat(tempStr, filename);
+    strcpy(filename, tempStr);
+}
+
+// Loads the data stored in the file into the database structs.
 void loadDatabase(char filename[MAX_FILENAME], Database* database) {
     FILE *fPtr = fopen(filename, "r");
 
+    // If the file couldn't be found
     if (fPtr == NULL) {
         puts("Could not find database file, creating new database file!");
-        createDatabaseFile(filename, database);
+        createDatabaseFile(filename, database); // If a file couldn't be found, the file is created.
     }
-    fscanf(fPtr, "%u\n", &database->size);
+    else {
+        fscanf(fPtr, "%u\n", &database->size);
 
-    while (database->size > database->capacity) {
-        expandDatabase(database);
-    }
-    for (size_t i = 0; i < database->size; i++) {
-        fscanf(fPtr, "%u\n", &database->dragons[i].id);
-
-        database->dragons[i].name = malloc(sizeof(char [NAME_SIZE]));
-        fscanf(fPtr, "%s\n", database->dragons[i].name);
-        fscanf(fPtr, "%c\n", &database->dragons[i].isVolant);
-        fscanf(fPtr, "%u\n", &database->dragons[i].fierceness);
-        fscanf(fPtr, "%u\n", &database->dragons[i].numColours);
-        for (size_t j = 0; j < database->dragons[i].numColours; j++) {
-            database->dragons[i].colours[j] = malloc(sizeof(NAME_SIZE));
-            fscanf(fPtr, "%s\n", database->dragons[i].colours[j]);
+        // Increases database capacity if current capacity limit is reached.
+        while (database->size > database->capacity) {
+            expandDatabase(database);
         }
+        // Inserts the values from the file to each dragon's fields.
+        for (size_t i = 0; i < database->size; i++) {
+            fscanf(fPtr, "%u\n", &database->dragons[i].id);
+
+            database->dragons[i].name = malloc(sizeof(char [NAME_SIZE]));
+            fscanf(fPtr, "%s\n", database->dragons[i].name);
+            fscanf(fPtr, "%c\n", &database->dragons[i].isVolant);
+            fscanf(fPtr, "%u\n", &database->dragons[i].fierceness);
+            fscanf(fPtr, "%u\n", &database->dragons[i].numColours);
+            for (size_t j = 0; j < database->dragons[i].numColours; j++) {
+                database->dragons[i].colours[j] = malloc(sizeof(NAME_SIZE));
+                fscanf(fPtr, "%s\n", database->dragons[i].colours[j]);
+            }
+        }
+        fscanf(fPtr, "%u\n", &database->nextId);
+        fclose(fPtr); // When done reading the file the connection to the file is closed.
     }
-    fscanf(fPtr, "%u\n", &database->nextId);
-    fclose(fPtr);
 }
 
+// Creates a file given by the provided file name.
 void createDatabaseFile(char filename[MAX_FILENAME], Database* database) {
     FILE *fPtr = fopen(filename, "w");
 
+    // If the file couldn't be created
     if (fPtr == NULL) {
         printf("Could not create database file");
         exit(-1);
@@ -63,31 +81,29 @@ void createDatabaseFile(char filename[MAX_FILENAME], Database* database) {
     fclose(fPtr);
 }
 
-// Each time a dragon is added to the database (i.e. the dynamic array dragons),
-// the database’s size is incremented. Then, when the database’s size reaches its current capacity,
-// the database is grown as described above. To do this, you can use the functions malloc or realloc
-// in stdlib.h.
-
+// Expands the database's capacity
 void expandDatabase(Database *database) {
 
-    // Create new database of size: current capacity * GROWTH_FACTOR
+    // Allocate memory for the newly created Dragons array with a capacity twice as big than previously. 
     Dragon *dragonPtr = (Dragon*) calloc(GROWTH_FACTOR * database->capacity, sizeof(Dragon));
     if (dragonPtr == NULL) printf("Could not expand database");
 
-    // Add dragons into the new database
+    // Move dragons from old array to new array
     for (int i = 0; i < database->size; i++) dragonPtr[i] = database->dragons[i];
 
     // Free the old array of dragons from the heap memory
     free(database->dragons);
     // Set the new array of dragons to be part of the active database
-    // Increase current capacity
     database->dragons = dragonPtr;
+    // Increase current capacity
     database->capacity = database->capacity * GROWTH_FACTOR;
 }
 
+// Overrides and writes each field from the database to the file
 void saveDatabase(char *filename, Database* database) {
     FILE *fPtr = fopen(filename, "w");
 
+    // If the file couldn't be found
     if (fPtr == NULL) {
         printf("Could not find database");
         exit(-1);
@@ -108,6 +124,7 @@ void saveDatabase(char *filename, Database* database) {
     fclose(fPtr);
 }
 
+// Releases the database's allocated memory from the heap
 void destroyDatabase(Database* database) {
     if(database != NULL) {
         free(database); // Frees memory from the memory allocated database strut.
