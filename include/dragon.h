@@ -12,6 +12,9 @@ void insertDragon(Database *database);
 void updateDragon(Database* database);
 // This function deletes an existing dragon in the database and returns void.
 void deleteDragon(Database *database);
+// This function is a helper function to deleteDragon, it helps with the deleteing process of a dragon. 
+// The function swaps the position of two adjecent dragons in the database and returns void.
+void swapDragons(Database *database, int startIdx);
 // This function shows a BRIEF list of the dragons existing in the database and returns void.
 void listBriefDragons(Database* database);
 // This function shows a DETAILED list of the dragons existing in the database and returns void.

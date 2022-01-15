@@ -4,7 +4,6 @@
 #include "dragon.h"
 #include "ui.h"
 
-static void swapDragons(Database *database, int startidx);
 static void sortDragonsByID(Database *database, int *j);
 static void sortDragonsByName(Database *database, int *i, int *j);
 static void nextDragon(int *i, int *j);
@@ -89,7 +88,7 @@ void listDBStatistics(Database* database) {
 }
 
 // Sorts the database either by id or name in acending order.
-void sortDatabase(Database *database) { // Sorts a database in ascending order based on id or name.
+void sortDatabase(Database *database) {
     int input = -1;
 
     // Loops until the user enters a valid option.
@@ -109,17 +108,10 @@ void sortDatabase(Database *database) { // Sorts a database in ascending order b
     puts("Database sorted.");
 }
 
-// Swaps position of one dragon with the next dragon
-static void swapDragon(Database *database, int startidx) { // Swaps dragons in database.
-    Dragon tempDragon = database->dragons[startidx];
-    database->dragons[startidx] = database->dragons[startidx+1];
-    database->dragons[startidx+1] = tempDragon;
-}
-
 // Sorts database by id order.
 static void sortDragonsByID(Database *database, int *j) {
     if (database->dragons[*j].id > database->dragons[*j+1].id) {
-        swapDragon(database, *j);
+        swapDragons(database, *j);
     }
     *j+=1;
 }
@@ -135,7 +127,7 @@ static void sortDragonsByName(Database *database, int *i, int *j) {
     if (*i == minLength) nextDragon(i, j);
     else {
         // If the character of position i in the first string comes after the character of position i in the second string in alphabetic order, the dragons swap positions.
-        if (database->dragons[*j].name[*i] > database->dragons[*j+1].name[*i]) swapDragon(database, *j);
+        if (database->dragons[*j].name[*i] > database->dragons[*j+1].name[*i]) swapDragons(database, *j);
         // Else if characters of position i are equal continue comparing the next set of characters.
         else if (database->dragons[*j].name[*i] == database->dragons[*j+1].name[*i]) *i+=1;
         // Else order is correct, continue to the next pair of dragons.

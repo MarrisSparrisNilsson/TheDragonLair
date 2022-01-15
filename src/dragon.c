@@ -6,42 +6,55 @@
 #include "dragon.h"
 #include "database.h"
 
-// This function sets the name of the dragon that is inserted or updated and returns void.
+// This function sets the name of the dragon that is inserted or updated.
 static void setDragonName(Database *database, unsigned int dragonIndex);
-// This function sets if the dragon can fly or not and returns a char.
-static char setIsVolant(Database *database, unsigned int dragonIndex);
-// This function sets the fierceness of the dragon from 1-10 and returns an int.
-static int setFierceness(Database *database, unsigned int dragonIndex);
-// This function sets the colors of a dragon (maximum 5) and returns void.
+
+// This function sets if the dragon can fly or not.
+static void setIsVolant(Database *database, unsigned int dragonIndex);
+
+// This function sets the fierceness of the dragon from 1-10.
+static void setFierceness(Database *database, unsigned int dragonIndex);
+
+// This function sets the colors of a dragon (maximum 5).
 static void setDragonColor(Database * database, unsigned int dragonIndex);
-// This function is a helper function to setDragonColor that helps with the format of the colors and it returns void.
+
+// This function is a helper function to setDragonColor that helps with the format of the colors.
 static void formatColorStr(char *string, bool *isValidInput);
-// This function is a helper function to deleteDragon, it helps with the deleteing process of a dragon. 
-// The function swaps the position of two adjecent dragons in the database and returns void.
-static void swapDragons(Database *database, int startIdx);
+
 // This function prints a BRIEF or DETAILED header.
 static void printHeader(enum ListType listType);
+
 // This function is a helper function to updateDragon, deleteDragon and listDetailedDragon. 
 // The function searches for an id or a name of a dragon and returns the index as an int of that dragon. 
 // If no dragon was found the function returns -1.
 static int findDragonIndex(char dragon[NAME_SIZE], Database *database);
-// This function is a helper function to findDragonIndex. 
+
+// getDragonIndexById is a helper function to findDragonIndex. 
 // Returns the index as an int of the first occurence of a dragon if serached by name.
 // If the user inputs an id it returns the index of the dragon with matching id. 
 // If the function doesn't find any dragon it returns -1.
-static int getDragonIndex(char dragon[NAME_SIZE], Database *database);
+static int getDragonIndexById(char input[NAME_SIZE], Database *database);
+
+// getDragonIndexByName is a helper function to findDragonIndex.
+// Returns the index as an int of the first occurence of a dragon if serached by name and counts
+// how many dragons matching the same name in the database.
+// If the function doesn't find any dragon it returns -1. 
+static int getDragonIndexByName(char dragon[NAME_SIZE], Database *database, int *dragonMatches);
+
 // This function finds all matching dragons based on id or name and prints them in an BRIEF list.
-// The function also counts how many dragons that was found and returns void.
-static void printDragonMatches(char dragon[NAME_SIZE], Database *database, int dragonIdx, int *dragonMatches, enum ListType listType);
-// This function basically prints info BRIEF or DETAILED about a dragon and returns void.
+// The function also counts how many dragons that was found.
+static void printDragonMatches(char dragon[NAME_SIZE], Database *database, int dragonIdx, enum ListType listType);
+
+// This function basically prints info BRIEF or DETAILED about a dragon.
 static void printDragon(Dragon dragon, enum ListType listType);
-// This function converts a string to uppercase and returns void.
+
+// This function converts a string to uppercase.
 static void stringToUpr(char *string);
 
-// Start of function insertDragon.
+// Inserts a dragon in the database.
 void insertDragon(Database *database) {
     
-    //Expands database when capacity reached its maximum
+    // Expands database when capacity reached its maximum
     if (database->size == database->capacity) expandDatabase(database); 
     int dragonIndex = database->size;
     
@@ -53,11 +66,12 @@ void insertDragon(Database *database) {
     database->dragons[dragonIndex].id = database->nextId; //Gives the inserted dragon the correct ID.
     printf("The dragon %s was entered into the database!\n", database->dragons[dragonIndex].name);
 
-    database->size++; //Increases the size of the database when a dragon have been inserted.
-    database->nextId++; //Increases the nextID of the database when a dragon have been inserted.
-}// End of function insertDragon.
-// Start of function setDragonName.
-static void setDragonName(Database *database, unsigned int dragonIndex) { // Sets name of the dragon.
+    database->size++; // Increases the size of the database when a dragon have been inserted.
+    database->nextId++; // Increases the nextID of the database when a dragon have been inserted.
+}
+
+// Sets name of the dragon.
+static void setDragonName(Database *database, unsigned int dragonIndex) {
     char dragonName[NAME_SIZE];
     bool isValidName = false;
 
@@ -68,7 +82,7 @@ static void setDragonName(Database *database, unsigned int dragonIndex) { // Set
         scanf("%10s", dragonName);
         
         int i = 0;
-        while (dragonName[i] != '\0' && isValidName) {// Loops until the whole string is checked if it is valid.
+        while (dragonName[i] != '\0' && isValidName) { // Loops until the whole string is checked if it is valid.
             if (!isalpha((dragonName[i]))) { // If the character on position i is NOT an alpha character, the name is invalid.
                 isValidName = false;
                 puts("\nInvalid name! Allowed characters are: (A-Z, a-z).\n");
@@ -82,9 +96,10 @@ static void setDragonName(Database *database, unsigned int dragonIndex) { // Set
     }
     database->dragons[dragonIndex].name = malloc(sizeof(char [NAME_SIZE])); // Allocates memory on the heap for the dragons name.
     strcpy(database->dragons[dragonIndex].name, dragonName); // Sets the name of the dragon in the correct position of the database.
-}// End of function setDragonName.
-// Start of function setIsVolant.
-static char setIsVolant(Database *database, unsigned int dragonIndex) { // Sets if the the dragon can fly or not.
+}
+
+// Sets if the the dragon can fly or not.
+static void setIsVolant(Database *database, unsigned int dragonIndex) {
     char isVolant;
     do { // Prompts the user first and if the input is invalid the function loops until a valid character is entered. 
         printf("Is your dragon volant? (Y/N): ");
@@ -99,9 +114,10 @@ static char setIsVolant(Database *database, unsigned int dragonIndex) { // Sets 
     } while (isVolant != 'Y' && isVolant != 'N');
 
     database->dragons[dragonIndex].isVolant = isVolant; // Sets Y or N in correct position of the database.
-}// End of function setIsVolant.
-// Start of function setFierceness.
-static int setFierceness(Database *database, unsigned int dragonIndex) { // Sets fierceness of the dragon.
+}
+
+// Sets fierceness of the dragon.
+static void setFierceness(Database *database, unsigned int dragonIndex) {
     unsigned int fierceness;
     do { // Prompts the user first and if the input is invalid the function loops until a valid integer is entered. 
         printf("How fierce is your dragon? (1-10): ");
@@ -114,9 +130,10 @@ static int setFierceness(Database *database, unsigned int dragonIndex) { // Sets
     } while (fierceness < 0 || fierceness > 10);
 
     database->dragons[dragonIndex].fierceness = fierceness; // Sets inputed integer in the correct position of the database.
-}// End of function setFierceness.
-// Start of function setDragonColor.
-static void setDragonColor(Database *database, unsigned int dragonIndex) { // Sets the colors of the dragon.
+}
+
+// Sets the colors of the dragon.
+static void setDragonColor(Database *database, unsigned int dragonIndex) {
 
     unsigned int numColours = 0;
     char color[NAME_SIZE];
@@ -144,9 +161,10 @@ static void setDragonColor(Database *database, unsigned int dragonIndex) { // Se
         }
     }
     database->dragons[dragonIndex].numColours = numColours; // Changes the number of colors a dragon has.
-}// End of function setDragonColor.
-// Start of function formatColorStr.
-static void formatColorStr(char *string, bool *isValidInput) { // Checks if the color is entered in a valid format.
+}
+
+// Checks if the color is entered in a valid format.
+static void formatColorStr(char *string, bool *isValidInput) {
     int i = 0;
     while (string[i] != '\0' && *isValidInput) {
         if (!isalpha(string[i])) { // If any character in the color entered is not part of the english alphabet input is invalid.
@@ -159,9 +177,10 @@ static void formatColorStr(char *string, bool *isValidInput) { // Checks if the 
             *isValidInput = true;
         }
     }
-}// End of function formatColorStr.
-// Start of function updateDragon.
-void updateDragon(Database* database) { // Updates an dragon in the database.    
+}
+
+// Updates an dragon in the database.    
+void updateDragon(Database* database) {
     
     char input[NAME_SIZE];
     int dragonIdx = -1;
@@ -184,9 +203,10 @@ void updateDragon(Database* database) { // Updates an dragon in the database.
         }
         else puts("Could not find a matching dragon, please try again!\n");
     }
-}// End of function updateDragon.
-// Start of function deleteDragon.
-void deleteDragon(Database *database) { // Deletes a dragon from the database.
+}
+
+// Deletes a dragon from the database.
+void deleteDragon(Database *database) {
 
     char input[NAME_SIZE];
     int dragonIdx = -1;
@@ -210,31 +230,35 @@ void deleteDragon(Database *database) { // Deletes a dragon from the database.
         }
         else puts("Could not find a matching dragon, please try again!\n");
     }
-}// End of function deleteDragon.
-// Start of function swapDragons.
-static void swapDragons(Database *database, int i) { // Swaps the position of two adjecent dragons in the database.
-    Dragon tempDragon = database->dragons[i];
-    database->dragons[i] = database->dragons[i+1];
-    database->dragons[i+1] = tempDragon;
-} // End of function swapDragons.
-// Start of function listBriefDragons.
-void listBriefDragons(Database* database) { // Lists all dragons in the database BRIEF.
+}
+
+// Swaps the position of two adjecent dragons in the database beginning at the start index.
+void swapDragons(Database *database, int startidx) {
+    Dragon tempDragon = database->dragons[startidx];
+    database->dragons[startidx] = database->dragons[startidx+1];
+    database->dragons[startidx+1] = tempDragon;
+} 
+
+// Lists brief information about all dragons in the database.
+void listBriefDragons(Database* database) {
     printHeader(BRIEF);
 
     for (size_t i = 0; i < database->size; i++) { // Prints the dragons to the screen.
         printDragon(database->dragons[i], BRIEF);
     }
-}// End of function listBriefDragons.
-// Start of function listDetailedDragons.
-void listDetailedDragons(Database* database) { // Lists all dragons in the database DETAILED.
+}
+
+// Lists detailed information about all dragons in the database.
+void listDetailedDragons(Database* database) {
     printHeader(DETAILED);
 
     for (size_t i = 0; i < database->size; i++) { // Prints the dragons to the screen.
         printDragon(database->dragons[i], DETAILED);
     }
-}// End of function listDetailedDragons.
-// Start of function showDragonDetail.
-void showDragonDetail(Database *database) { // Shows all details of one specific dragon.
+}
+
+// Shows detailed information of one specific dragon.
+void showDragonDetail(Database *database) {
 
     char input[NAME_SIZE];
 
@@ -248,100 +272,111 @@ void showDragonDetail(Database *database) { // Shows all details of one specific
         printDragon(database->dragons[dragonIdx], DETAILED);
     }
     if (dragonIdx == -1) printf("Could not find a dragon match.");
-}// End of function showDragonDetail.
-// Start of function printHeader.
-static void printHeader(enum ListType listType) { // Prints a header BRIEF or DETAILED.
-    if (listType == DETAILED) {
-        puts("--------------------------------------------------------------------------------");
-        puts("ID Name \t Volant Fierceness #Colours Colours");
-        puts("--------------------------------------------------------------------------------");
-    }
-    else {
-        puts("--------------------------------------------------------------------------------");
-        puts("ID Name");
-        puts("--------------------------------------------------------------------------------");
-    }    
-} // End of function printHeader.
-// Start of function findDragonIndex.
-// Searches for a dragon by name or id and returns its index if found orelse it returns -1.
+}
+
+// Searches for a dragon by name or id and returns its index if found or else it returns -1.
 static int findDragonIndex(char input[NAME_SIZE], Database *database) {
     int dragonIdx = -1;
 
-    if (isdigit(input[0])) return dragonIdx = getDragonIndex(input, database);
-    else {
+    if (isdigit(input[0])) dragonIdx = getDragonIndexById(input, database);
+    else if (isalpha(input[0])) { // Checks if the string is a name.
         stringToUpr(input); // Converts input string to uppercase letters.
         unsigned int dragonMatches = 0;
         // Searches for a dragon by name and returns the index of the first occurance of that name or if no dragon found returns -1.
-        dragonIdx = getDragonIndex(input, database);
-        printDragonMatches(input, database, dragonIdx, &dragonMatches, BRIEF); // Prints all dragons with the same name.
+        dragonIdx = getDragonIndexByName(input, database, &dragonMatches);
 
         if (dragonMatches > 1) { // If we have more than one dragon with the same name.
-            int dragonID = -1;
-            while (dragonID == -1) { // Loops until user inputs a valid id provided from the list printed to the screen.
+            printDragonMatches(input, database, dragonIdx, BRIEF); // Prints all dragons with the same name.
+            unsigned int dragonID;
+            dragonIdx = -1;
+            while (dragonIdx == -1) { // Loops until user inputs a valid id provided from the list printed to the screen.
                 printf("Please enter the id matching the dragon you want to select: ");
                 fflush(stdin);
                 scanf("%d", &dragonID);
+                int i = 0;
                 // Loops through the whole database until a dragon with the correct name and id is found.
-                for (size_t i = 0; i < database->size; i++) {
+                while (i < database->size && dragonIdx == -1) {
                     if (dragonID == database->dragons[i].id && strcmp(input, database->dragons[i].name) == 0) {
-                        dragonID = 0;
-                        return i;
+                        dragonIdx = i;
                     }
+                    i++;
                 }
-                if (dragonID != 0) {
-                    dragonID = -1; 
-                    puts("Invalid input! Please select one of the listed selections above.\n");
-                }
-            }
-        }
-        else return dragonIdx;
-    }
-}// End of function findDragonIndex.
-// Start of function getDragonIndex.
-// Returns dragon index based on name, id or if no dragon found returns -1.
-static int getDragonIndex(char input[NAME_SIZE], Database *database) {
-    char *endPtr;
-    int dragonIdx = -1;
-
-    if (isdigit(input[0])) { // Checks if the string is a id.
-        int dragonID = strtol(input, &endPtr, 10);
-        for (size_t i = 0; i < database->size; i++) {
-            if (dragonID == database->dragons[i].id) {
-                return i;
-            }
-        }
-    }
-    else if (isalpha(input[0])) { // Checks if the string is a name.
-        for (size_t i = 0; i < database->size; i++) {
-            stringToUpr(input); // Converts the string to uppercase letters.
-            if (strcmp(input, database->dragons[i].name) == 0) {
-                return i;
+                // If no dragon was found the following message is printed.
+                if (dragonIdx == -1) puts("Invalid input! Please select one of the listed selections above.\n");
             }
         }
     }
     return dragonIdx;
-}// End of function getDragonIndex.
-// Start of function printDragonMatches.
-// Prints all dragons with the same name or one dragon based on id.
-static void printDragonMatches(char input[NAME_SIZE], Database *database, int dragonIdx, int *dragonMatches, enum ListType listType) {
+}
+
+// Returns dragon index based on id, if no dragon was found -1 is returned.
+static int getDragonIndexById(char input[NAME_SIZE], Database *database) {
     char *endPtr;
-    for (size_t i = dragonIdx; i < database->size; i++) { // Prints dragons based on id or name.
+    int dragonID = strtol(input, &endPtr, 10);
+    int dragonIdx = -1;
+    int i = 0;
+    // Loops until a dragon matching the id is found.
+    while (i < database->size && dragonIdx == -1) {
+        if (dragonID == database->dragons[i].id) {
+            dragonIdx = i;
+        }
+        i++;
+    }
+    return dragonIdx;
+}
+
+// Returns dragon index based on name, if no dragon was found -1 is returned.
+static int getDragonIndexByName(char input[NAME_SIZE], Database *database, int *dragonMatches) {
+    int dragonIdx = -1;
+
+    int i = 0;
+    while (i < database->size) {
+        stringToUpr(input); // Converts the string to uppercase letters.
+        if (strcmp(input, database->dragons[i].name) == 0) {
+            *dragonMatches+=1; // Counts number of dragons with the same name found.
+            if (dragonIdx == -1) dragonIdx = i;
+        }
+        i++;
+    }
+    return dragonIdx;
+}
+
+// Converts strings to uppercase letters.
+static void stringToUpr(char *string) {
+    for (size_t i = 0; string[i] != '\0'; i++) {
+        string[i] = toupper(string[i]);
+    }
+}
+
+// Prints a header for brief or detailed information.
+static void printHeader(enum ListType listType) {
+    puts("--------------------------------------------------------------------------------");
+    printf("ID Name %s\n", listType == DETAILED ? "\t Volant Fierceness #Colours Colours" : "");
+    puts("--------------------------------------------------------------------------------");
+} 
+
+// Prints all dragons with the same name or one dragon based on id.
+static void printDragonMatches(char input[NAME_SIZE], Database *database, int dragonIdx, enum ListType listType) {
+    char *endPtr;
+    printHeader(listType);
+    int i = dragonIdx;
+    while (i < database->size) { // Prints dragons based on id or name.
         if (strtol(input, &endPtr, 10) == database->dragons[i].id) {
             printDragon(database->dragons[i], listType);
             return;
-        } 
+        }
         else if (strcmp(input, database->dragons[i].name) == 0) {
             printDragon(database->dragons[i], listType);
-            *dragonMatches+=1; // Counts number of dragons with the same name found.
         }
+        i++;
     }
-} // End of function printDragonMatches.
-// Start of function printDragon.
-static void printDragon(Dragon dragon, enum ListType listType) { // Prints info of a dragon DETAILED or BRIEF.
+} 
+
+// Prints info of a dragon DETAILED or BRIEF.
+static void printDragon(Dragon dragon, enum ListType listType) {
     if (listType == DETAILED) {
-        printf("%2d %-*s \t %6c %10u %8d ",
+        printf("%2d %-s \t %6c %10u %8d ",
         dragon.id,
-        NAME_SIZE,
         dragon.name,
         dragon.isVolant,
         dragon.fierceness,
@@ -352,16 +387,9 @@ static void printDragon(Dragon dragon, enum ListType listType) { // Prints info 
         }
     }
     else {
-        printf("%2d %-*s",
+        printf("%2d %-s",
         dragon.id,
-        NAME_SIZE,
         dragon.name);
     }
     printf("\n");
-}// End of function printDragon.
-// Start of function stringToUpr.
-static void stringToUpr(char *string) { // Converts strings to uppercase letters.
-    for (size_t i = 0; string[i] != '\0'; i++) {
-        string[i] = toupper(string[i]);
-    }
-}// End of function stringToUpr.
+}
