@@ -14,9 +14,9 @@ Database* createDatabase() {
     dBPtr->dragons = (Dragon*) calloc(INITIAL_CAPACITY, sizeof(Dragon)); // Allocates memory on the heap for the dragons array.
     if (dBPtr->dragons == NULL) return NULL;
 
-    dBPtr->capacity = INITIAL_CAPACITY; // Sets the initial capacity of the database
-    dBPtr->size = 0; // Start size is set to 0
-    dBPtr->nextId = 1; // The id for the next dragon to be inserted is set to 1
+    dBPtr->capacity = INITIAL_CAPACITY; // Sets the initial capacity of the database.
+    dBPtr->size = 0; // Start size is set to 0.
+    dBPtr->nextId = 1; // The id for the next dragon to be inserted is set to 1.
 
     return dBPtr;
 }
@@ -25,9 +25,9 @@ Database* createDatabase() {
 void getDatabaseFilename(char filename[MAX_FILENAME]) {
     printf("Please enter filename: ");
     scanf("%s", filename);
-
+    // We do this because we want the files to be place in our database folder without the user needing to specify that.
     char tempStr[MAX_FILENAME];
-    strcpy(tempStr, "Database/");
+    strcpy(tempStr, "Database/"); 
     strcat(tempStr, filename);
     strcpy(filename, tempStr);
 }
@@ -71,14 +71,14 @@ void loadDatabase(char filename[MAX_FILENAME], Database* database) {
 void createDatabaseFile(char filename[MAX_FILENAME], Database* database) {
     FILE *fPtr = fopen(filename, "w");
 
-    // If the file couldn't be created
+    // If the file couldn't be created the program terminates.
     if (fPtr == NULL) {
         printf("Could not create database file");
         exit(-1);
     }
     fprintf(fPtr, "%u\n", database->size);
     fprintf(fPtr, "%u\n", database->nextId);
-    fclose(fPtr);
+    fclose(fPtr); // Closes the connection to the file stream.
 }
 
 // Expands the database's capacity

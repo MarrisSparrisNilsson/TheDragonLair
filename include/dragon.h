@@ -2,6 +2,7 @@
 #define _dragon_h
 
 #include "dBstructs.h"
+// This define is used to create a maximum name length for the dragons, colours and for the user input when searching for dragons.
 #define NAME_SIZE 10
 // This enumeration represents different print methods.
 enum ListType { DETAILED, BRIEF };
@@ -22,4 +23,4 @@ void listDetailedDragons(Database* database);
 // This function shows all details for a specific dragon existing in the database and returns void.
 void showDragonDetail(Database* database);
 
-#endif
+#endif // End of dragon.h

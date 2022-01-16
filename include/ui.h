@@ -7,11 +7,5 @@
 void executeCommands(Database *database);
 // Prints a welcome message.
 void printWelcomeMessage();
-// Displays the main menu.
-void displayMainMenu();
-// Displays statistics about the database.
-void listDBStatistics(Database* database);
-// Sorts the database either by id or name in acending order.
-void sortDatabase(Database *database);
 
-#endif
+#endif // End of ui.h

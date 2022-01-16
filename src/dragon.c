@@ -33,13 +33,13 @@ static int findDragonIndex(char dragon[NAME_SIZE], Database *database);
 // Returns the index as an int of the first occurence of a dragon if serached by name.
 // If the user inputs an id it returns the index of the dragon with matching id. 
 // If the function doesn't find any dragon it returns -1.
-static int getDragonIndexById(char input[NAME_SIZE], Database *database);
+static int getDragonIndexById(char input[NAME_SIZE], Database *database, int dragonIdx);
 
 // getDragonIndexByName is a helper function to findDragonIndex.
 // Returns the index as an int of the first occurence of a dragon if serached by name and counts
 // how many dragons matching the same name in the database.
 // If the function doesn't find any dragon it returns -1. 
-static int getDragonIndexByName(char dragon[NAME_SIZE], Database *database, int *dragonMatches);
+static int getDragonIndexByName(char dragon[NAME_SIZE], Database *database, int *dragonMatches, int dragonIdx);
 
 // This function finds all matching dragons based on id or name and prints them in an BRIEF list.
 // The function also counts how many dragons that was found.
@@ -67,7 +67,7 @@ void insertDragon(Database *database) {
     printf("The dragon %s was entered into the database!\n", database->dragons[dragonIndex].name);
 
     database->size++; // Increases the size of the database when a dragon have been inserted.
-    database->nextId++; // Increases the nextID of the database when a dragon have been inserted.
+    database->nextId++; // Increases the nextId of the database when a dragon have been inserted.
 }
 
 // Sets name of the dragon.
@@ -278,12 +278,12 @@ void showDragonDetail(Database *database) {
 static int findDragonIndex(char input[NAME_SIZE], Database *database) {
     int dragonIdx = -1;
 
-    if (isdigit(input[0])) dragonIdx = getDragonIndexById(input, database);
+    if (isdigit(input[0])) dragonIdx = getDragonIndexById(input, database, dragonIdx);
     else if (isalpha(input[0])) { // Checks if the string is a name.
         stringToUpr(input); // Converts input string to uppercase letters.
         unsigned int dragonMatches = 0;
         // Searches for a dragon by name and returns the index of the first occurance of that name or if no dragon found returns -1.
-        dragonIdx = getDragonIndexByName(input, database, &dragonMatches);
+        dragonIdx = getDragonIndexByName(input, database, &dragonMatches, dragonIdx);
 
         if (dragonMatches > 1) { // If we have more than one dragon with the same name.
             printDragonMatches(input, database, dragonIdx, BRIEF); // Prints all dragons with the same name.
@@ -310,10 +310,9 @@ static int findDragonIndex(char input[NAME_SIZE], Database *database) {
 }
 
 // Returns dragon index based on id, if no dragon was found -1 is returned.
-static int getDragonIndexById(char input[NAME_SIZE], Database *database) {
+static int getDragonIndexById(char input[NAME_SIZE], Database *database, int dragonIdx) {
     char *endPtr;
     int dragonID = strtol(input, &endPtr, 10);
-    int dragonIdx = -1;
     int i = 0;
     // Loops until a dragon matching the id is found.
     while (i < database->size && dragonIdx == -1) {
@@ -326,9 +325,7 @@ static int getDragonIndexById(char input[NAME_SIZE], Database *database) {
 }
 
 // Returns dragon index based on name, if no dragon was found -1 is returned.
-static int getDragonIndexByName(char input[NAME_SIZE], Database *database, int *dragonMatches) {
-    int dragonIdx = -1;
-
+static int getDragonIndexByName(char input[NAME_SIZE], Database *database, int *dragonMatches, int dragonIdx) {
     int i = 0;
     while (i < database->size) {
         stringToUpr(input); // Converts the string to uppercase letters.
