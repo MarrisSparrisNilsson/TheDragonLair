@@ -4,8 +4,17 @@
 #include "dragon.h"
 #include "ui.h"
 
+// Displays the main menu.
+static void displayMainMenu();
+// Displays statistics about the database.
+static void listDBStatistics(Database* database);
+// Sorts the database either by id or name in acending order.
+static void sortDatabase(Database *database);
+// This function is a helper function to sortDatabase and it sorts dragons by id.
 static void sortDragonsByID(Database *database, int *j);
+// This function is a helper function to sortDatabase and it sorts dragons by name.
 static void sortDragonsByName(Database *database, int *i, int *j);
+// This function is a helper function to sortDatabase and it switches to the next dragon that needs to be compared to sort the database.
 static void nextDragon(int *i, int *j);
 
 // Handles the execution of the program depending on the input from the user.
@@ -48,7 +57,7 @@ void printWelcomeMessage() {
 }
 
 // Displays the main menu.
-void displayMainMenu() { 
+static void displayMainMenu() { 
     printf(
         "\n== Main Menu ==\n"
         "0. Display menu.\n"
@@ -65,7 +74,7 @@ void displayMainMenu() {
 }
 
 // Displays statistics about the database.
-void listDBStatistics(Database* database) {
+static void listDBStatistics(Database* database) {
     puts("---------------------------------------------------");
     puts("Size MinFierceness MaxFierceness #Volant #NonVolant");
     puts("---------------------------------------------------");
@@ -88,7 +97,7 @@ void listDBStatistics(Database* database) {
 }
 
 // Sorts the database either by id or name in acending order.
-void sortDatabase(Database *database) {
+static void sortDatabase(Database *database) {
     int input = -1;
 
     // Loops until the user enters a valid option.
